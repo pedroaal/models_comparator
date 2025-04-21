@@ -1,24 +1,41 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.base import BaseEstimator, TransformerMixin
 
-class FeatureSelector(BaseEstimator, TransformerMixin):
-    def __init__(self, threshold=0.4):
-        self.threshold = threshold
-        
+class NegativeValueHandler(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
-        # Calculate feature importance using correlation with target
-        if y is not None:
-            self.feature_importance = abs(X.corrwith(y))
-            self.selected_features = self.feature_importance[self.feature_importance >= self.threshold].index
         return self
-        
+    
     def transform(self, X):
-        return X[self.selected_features]
+        X = X.copy()
+        pollutant_cols = ['COUGM3', 'NO2UGM3', 'O3UGM3', 'PM25', 'SO2UGM3']
+        X[pollutant_cols] = X[pollutant_cols].clip(lower=0)
+        return X
 
-def get_preprocessing_pipeline():
+class WeatherFeatureEngineer(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X = X.copy()
+        # Example: Convert rainfall to binary feature
+        X['HAS_RAINFALL'] = X['RAINFALL'].apply(lambda x: 1 if x > 0 else 0)
+        return X
+
+def get_cleaning_pipeline():
     return Pipeline([
-        # ('feature_selector', FeatureSelector()),
+        ('negative_fixer', NegativeValueHandler()),
+        ('weather_engineer', WeatherFeatureEngineer()),
+        ('imputer', SimpleImputer(strategy='mean')),
+        ('scaler', StandardScaler())
+    ])
+
+def get_pipeline():
+    return Pipeline([
+        ('negative_fixer', NegativeValueHandler()),
+        ('weather_engineer', WeatherFeatureEngineer()),
+        ('imputer', SimpleImputer(strategy='mean')),
         ('scaler', StandardScaler())
     ])
