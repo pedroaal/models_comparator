@@ -1,0 +1,31 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+from knn_model import KNNModel
+from svm_model import SVMModel
+
+def main():
+  df = pd.read_csv('data.csv')
+  df.fillna(df.mean(), inplace=True)
+  target_column = 'test_clasiffier'
+
+  X = df.drop(columns=[target_column], axis=1)
+  y = df[target_column]
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=28)
+  df_train = pd.concat([X_train, y_train], axis=1)
+  df_test = pd.concat([X_test, y_test], axis=1)
+  
+  # Run knn model
+  print("\n=== KNN ===")
+  model = KNNModel()
+  model.train(df_train, target_column)
+  model.evaluate(df_test, target_column)
+
+  # Run svm model
+  print("\n=== SVM ===")
+  model = SVMModel()
+  model.train(df_train, target_column)
+  model.evaluate(df_test, target_column)
+  
+if __name__ == "__main__":
+  main()
