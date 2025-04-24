@@ -1,13 +1,12 @@
-import pandas as pd
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI
 
-from models.knn_model import KNNModel
+from models.gradient_boosting_model import GradientBoostingModel
 
 app = FastAPI()
 
 @app.post("/predict")
 def predict(data: list):
-  model = KNNModel()
+  model = GradientBoostingModel()
   predictions = model.predict(data)
   return {"prediction": predictions.tolist()}
 

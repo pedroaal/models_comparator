@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy import stats
 
 def basic_info(df):
   print("\n=== DATASET OVERVIEW ===")
@@ -150,7 +149,8 @@ def time_series_check(df):
     try:
       pd.to_datetime(df[col], errors='raise')
       potential_date_cols.append(col)
-    except:
+    except  (ValueError, TypeError) as e:
+      print(e)
       pass
   
   if len(date_cols) == 0 and len(potential_date_cols) == 0:

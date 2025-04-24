@@ -18,7 +18,7 @@ class GradientBoostingModel:
                 random_state=28
             ))
         ])
-        self.model_path = f"gb_model.pkl"
+        self.model_path = "gb_model.pkl"
 
     def train(self, df: pd.DataFrame, target_col: str):
         X = df.drop(columns=[target_col])
@@ -38,10 +38,10 @@ class GradientBoostingModel:
         y_pred = model.predict(X)
         
         metrics = {
-            'mse': mean_squared_error(y_test, y_pred),
+            'mse': mean_squared_error(y, y_pred),
             'rmse': np.sqrt(mse),
-            'mae': mean_absolute_error(y_test, y_pred),
-            'r2': r2_score(y_test, y_pred),
+            'mae': mean_absolute_error(y, y_pred),
+            'r2': r2_score(y, y_pred),
         }
 
         print(f"Mean Squared Error: {metrics['mse']:.2f}")

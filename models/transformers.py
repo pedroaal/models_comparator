@@ -1,4 +1,3 @@
-import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
@@ -23,14 +22,6 @@ class WeatherFeatureEngineer(BaseEstimator, TransformerMixin):
         # Example: Convert rainfall to binary feature
         X['HAS_RAINFALL'] = X['RAINFALL'].apply(lambda x: 1 if x > 0 else 0)
         return X
-
-def get_cleaning_pipeline():
-    return Pipeline([
-        ('negative_fixer', NegativeValueHandler()),
-        ('weather_engineer', WeatherFeatureEngineer()),
-        ('imputer', SimpleImputer(strategy='mean')),
-        ('scaler', StandardScaler())
-    ])
 
 def get_pipeline():
     return Pipeline([
