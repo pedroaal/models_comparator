@@ -37,8 +37,9 @@ class GradientBoostingModel:
         model = joblib.load(self.model_path)
         y_pred = model.predict(X)
         
+        mse = mean_squared_error(y, y_pred)
         metrics = {
-            'mse': mean_squared_error(y, y_pred),
+            'mse': mse,
             'rmse': np.sqrt(mse),
             'mae': mean_absolute_error(y, y_pred),
             'r2': r2_score(y, y_pred),
