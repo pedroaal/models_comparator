@@ -6,7 +6,7 @@ from gradient_boosting_model import GradientBoostingModel
 def main():
   df = pd.read_csv('data.csv')
   df.fillna(df.mean(), inplace=True)
-  target_column = 'PM25'
+  target_column = 'AMBTEMP'
 
   X = df.drop(columns=[target_column], axis=1)
   y = df[target_column]
