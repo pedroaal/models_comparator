@@ -23,10 +23,12 @@ class WeatherFeatureEngineer(BaseEstimator, TransformerMixin):
         X['HAS_RAINFALL'] = X['RAINFALL'].apply(lambda x: 1 if x > 0 else 0)
         return X
 
-def get_pipeline():
+def clean_pipeline():
     return Pipeline([
         ('negative_fixer', NegativeValueHandler()),
         ('weather_engineer', WeatherFeatureEngineer()),
         ('imputer', SimpleImputer(strategy='mean')),
+        # quitar la varialble de radiacion solar
+        # implementar un pca
         ('scaler', StandardScaler())
     ])

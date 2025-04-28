@@ -5,12 +5,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-from transformers import get_pipeline
+from .transformers import clean_pipeline
 
 class GradientBoostingModel:
     def __init__(self):
         self.pipeline = Pipeline([
-            ('cleaning', get_pipeline()),
+            ('cleaning', clean_pipeline()),
             ('model', GradientBoostingRegressor(
                 n_estimators=150,
                 learning_rate=0.1,

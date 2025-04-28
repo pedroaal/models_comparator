@@ -5,12 +5,12 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-from transformers import get_pipeline
+from transformers import clean_pipeline
 
 class KNNModel:
   def __init__(self):
     self.pipeline = Pipeline([
-      ('preprocessing', get_pipeline()),
+      ('preprocessing', clean_pipeline()),
       ('knn', KNeighborsClassifier())
     ])
     self.model_path = "knn_model.pkl"

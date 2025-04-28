@@ -5,12 +5,12 @@ from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
-from transformers import get_pipeline
+from transformers import clean_pipeline
 
 class SVMModel:
   def __init__(self):
     self.pipeline = Pipeline([
-      ('preprocessing', get_pipeline()),
+      ('preprocessing', clean_pipeline()),
       ('svm', SVC())
     ])
     self.model_path = "svm_model.pkl"
