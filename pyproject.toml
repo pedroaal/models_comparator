@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.12",
     "pandas>=2.2.3",
+    "pydantic>=2.11.3",
     "python-multipart>=0.0.20",
     "ruff>=0.11.7",
     "scikit-learn>=1.6.1",
