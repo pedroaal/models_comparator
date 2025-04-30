@@ -67,10 +67,9 @@ def categorical_analysis(df):
     value_counts = df[col].value_counts()
     print(f"Number of unique values: {len(value_counts)}")
 
-    if len(value_counts) <= 20:  # Only show if not too many categories
+    if len(value_counts) <= 20:
       print(value_counts)
       
-      # Bar plot for categorical columns
       plt.figure(figsize=(12, 6))
       sns.countplot(y=col, data=df, order=df[col].value_counts().index[:20])
       plt.title(f'Count of {col}')
@@ -92,7 +91,6 @@ def correlation_analysis(df):
   print("\n=== CORRELATION ANALYSIS ===")
   corr_matrix = df[numerical_cols].corr()
   
-  # Plot correlation heatmap
   plt.figure(figsize=(12, 10))
   sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
   plt.title('Correlation Matrix')
@@ -101,7 +99,6 @@ def correlation_analysis(df):
   plt.close()
   print("\nCorrelation matrix saved as 'correlation_matrix.png'")
   
-  # Find highly correlated features
   print("\nHighly correlated features (|r| > 0.7):")
   high_corr = np.where(np.abs(corr_matrix) > 0.7)
   high_corr_list = [(corr_matrix.columns[x], corr_matrix.columns[y], corr_matrix.iloc[x, y]) 
@@ -140,12 +137,10 @@ def outlier_detection(df):
 def time_series_check(df):
   date_cols = df.select_dtypes(include=['datetime64']).columns
   
-  # Also check for columns that might be dates but stored as objects
   object_cols = df.select_dtypes(include=['object']).columns
   potential_date_cols = []
   
   for col in object_cols:
-    # Try to convert to datetime
     try:
       pd.to_datetime(df[col], errors='raise')
       potential_date_cols.append(col)
@@ -159,14 +154,12 @@ def time_series_check(df):
   
   print("\n=== TIME SERIES ANALYSIS ===")
   
-  # Process actual datetime columns
   for col in date_cols:
     print(f"\nDatetime column: {col}")
     print(f"Min date: {df[col].min()}")
     print(f"Max date: {df[col].max()}")
     print(f"Range: {df[col].max() - df[col].min()}")
   
-  # Process potential datetime columns
   for col in potential_date_cols:
     print(f"\nPotential datetime column: {col}")
     print("Sample values:")
@@ -180,7 +173,6 @@ def main():
   print("\n=== FIRST 5 ROWS ===")
   print(df.head())
   
-  # Run all analysis functions
   basic_info(df)
   numerical_analysis(df)
   categorical_analysis(df)
