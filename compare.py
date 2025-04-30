@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from gradient_boosting_model import GradientBoostingModel
+from models import GradientBoostingModel
 
 def main():
   df = pd.read_csv('data.csv')
