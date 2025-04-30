@@ -5,7 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-from transformers import clean_pipeline
+from .transformers import clean_pipeline
 
 class KNNModel:
   def __init__(self):

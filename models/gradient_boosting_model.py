@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-from models.transformers import clean_pipeline
+from .transformers import clean_pipeline
 
 class GradientBoostingModel:
     def __init__(self):
