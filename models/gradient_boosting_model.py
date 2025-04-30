@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-from .transformers import clean_pipeline
+from models.transformers import clean_pipeline
 
 class GradientBoostingModel:
     def __init__(self):
@@ -26,9 +26,17 @@ class GradientBoostingModel:
         self.pipeline.fit(X, y)
         joblib.dump(self.pipeline, self.model_path)
 
-    def predict(self, features: list):
-        model = joblib.load(self.model_path)
-        return model.predict(np.array(features))
+    def predict(self, data: list[float]):
+        data_array = np.array(data).reshape(1, -1)
+        print(data_array)
+
+        try: 
+            loaded_model = joblib.load(self.model_path)
+            predictions = loaded_model.predict(data_array)
+            return predictions
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            return [0.0]
 
     def evaluate(self, df: pd.DataFrame, target_column: str):
         X = df.drop(columns=[target_column])
