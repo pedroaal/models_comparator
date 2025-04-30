@@ -19,7 +19,6 @@ class WeatherFeatureEngineer(BaseEstimator, TransformerMixin):
     
     def transform(self, X):
         X = X.copy()
-        # Example: Convert rainfall to binary feature
         X['HAS_RAINFALL'] = X['RAINFALL'].apply(lambda x: 1 if x > 0 else 0)
         return X
 
@@ -28,7 +27,8 @@ def clean_pipeline():
         ('negative_fixer', NegativeValueHandler()),
         ('weather_engineer', WeatherFeatureEngineer()),
         ('imputer', SimpleImputer(strategy='mean')),
-        # quitar la varialble de radiacion solar
-        # implementar un pca
+        # todo: quitar la varialble de radiacion solar
+        # todo: agregar la columna date-time separando el mes, ano, hora
+        # todo: implementar un pca
         ('scaler', StandardScaler())
     ])
