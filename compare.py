@@ -17,9 +17,7 @@ def main():
 
   X = df.drop(columns=[target_column], axis=1)
   y = df[target_column]
-  X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=28
-  )
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=28)
   df_train = pd.concat([X_train, y_train], axis=1)
   df_test = pd.concat([X_test, y_test], axis=1)
 
