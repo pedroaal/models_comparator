@@ -8,7 +8,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from .transformers import clean_pipeline
 
 class GradientBoostingModel:
-    def __init__(self):
+    def __init__(self, path="gb_model.pkl"):
         self.pipeline = Pipeline([
             ('cleaning', clean_pipeline()),
             ('model', GradientBoostingRegressor(
@@ -18,7 +18,7 @@ class GradientBoostingModel:
                 random_state=28
             ))
         ])
-        self.model_path = "gb_model.pkl"
+        self.model_path = path
 
     def train(self, df: pd.DataFrame, target_col: str):
         X = df.drop(columns=[target_col])

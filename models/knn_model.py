@@ -8,12 +8,12 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from .transformers import clean_pipeline
 
 class KNNModel:
-  def __init__(self):
+  def __init__(self, path="knn_model.pkl"):
     self.pipeline = Pipeline([
       ('preprocessing', clean_pipeline()),
       ('knn', KNeighborsClassifier())
     ])
-    self.model_path = "knn_model.pkl"
+    self.model_path = path
   
   def train(self, df: pd.DataFrame, target_column: str):
     X = df.drop(columns=[target_column])

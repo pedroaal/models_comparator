@@ -5,13 +5,15 @@ from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
+from .transformers import clean_pipeline
+
 class SVMModel:
-  def __init__(self):
+  def __init__(self, path="svm_model.pkl"):
     self.pipeline = Pipeline([
       ('preprocessing', clean_pipeline()),
       ('svm', SVC())
     ])
-    self.model_path = "svm_model.pkl"
+    self.model_path = path
 
   def train(self, data: pd.DataFrame, target_column: str):
     X = data.drop(columns=[target_column])
