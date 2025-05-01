@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from models import SVMModel
 from models import GradientBoostingModel
 
 def main():
@@ -14,8 +15,14 @@ def main():
   df_train = pd.concat([X_train, y_train], axis=1)
   df_test = pd.concat([X_test, y_test], axis=1)
   
+  # Run svm model
+  print("\n=== Support vector machine ===")
+  model = SVMModel()
+  model.train(df_train, target_column)
+  model.evaluate(df_test, target_column)
+
   # Run gradient boost model
-  print("\n=== Gradient boost, kbest ===")
+  print("\n=== Gradient boost ===")
   model = GradientBoostingModel()
   model.train(df_train, target_column)
   model.evaluate(df_test, target_column)
