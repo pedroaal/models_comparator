@@ -1,3 +1,4 @@
+import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -7,6 +8,7 @@ app = FastAPI()
 
 
 class Weather(BaseModel):
+  datetime: str
   ambtemp: float
   cougm3: float
   no2ugm3: float
@@ -14,11 +16,15 @@ class Weather(BaseModel):
   pm25: float
   rainfall: float
   so2ugm3: float
+  solarrad: float
   uv_index: float
 
 
 @app.post("/predict")
 def predict(data: Weather):
+  # Convert datetime string to datetime object
+  dt = pd.to_datetime(data.datetime)
+
   predict_data = [
     data.cougm3,
     data.no2ugm3,
@@ -27,6 +33,9 @@ def predict(data: Weather):
     data.rainfall,
     data.so2ugm3,
     data.uv_index,
+    dt.year,
+    dt.month,
+    dt.hour,
   ]
   model = GradientBoostingModel()
   predictions = model.predict(predict_data)
@@ -38,4 +47,4 @@ if __name__ == "__main__":
 
   uvicorn.run(app, host="0.0.0.0", port=8000)
 
-# todo: implementar un html para la api
+# TODO: implementar un html para la api
