@@ -6,10 +6,10 @@ from .sarima_model import SARIMAModel
 from .lstm_model import LSTMModel
 
 __all__ = [
-    "KNNModel",
-    "SVMModel",
-    "GradientBoostingModel",
-    "RandomForestModel",
-    "SARIMAModel",
-    "LSTMModel",
+  "KNNModel",
+  "SVMModel",
+  "GradientBoostingModel",
+  "RandomForestModel",
+  "SARIMAModel",
+  "LSTMModel",
 ]
