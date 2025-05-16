@@ -175,7 +175,6 @@ def time_series_check(df):
 
 def main():
   df = pd.read_csv("data.csv")
-  df.dropna(inplace=True)
 
   print("\n=== FIRST 5 ROWS ===")
   print(df.head())
