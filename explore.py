@@ -16,9 +16,7 @@ def basic_info(df):
   print("\n=== MISSING VALUES ===")
   missing = df.isnull().sum()
   missing_percent = (missing / len(df)) * 100
-  missing_info = pd.DataFrame(
-    {"Missing Values": missing, "Percentage": missing_percent}
-  )
+  missing_info = pd.DataFrame({"Missing Values": missing, "Percentage": missing_percent})
   print(missing_info[missing_info["Missing Values"] > 0])
 
   print("\n=== DUPLICATED ROWS ===")
@@ -95,9 +93,7 @@ def correlation_analysis(df):
   corr_matrix = df[numerical_cols].corr()
 
   plt.figure(figsize=(12, 10))
-  sns.heatmap(
-    corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5
-  )
+  sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
   plt.title("Correlation Matrix")
   plt.tight_layout()
   plt.savefig("correlation_matrix.png")
@@ -179,7 +175,7 @@ def time_series_check(df):
 
 def main():
   df = pd.read_csv("data.csv")
-  df.fillna(df.mean(), inplace=True)
+  df.dropna(inplace=True)
 
   print("\n=== FIRST 5 ROWS ===")
   print(df.head())
