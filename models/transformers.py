@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -47,7 +48,7 @@ def clean_pipeline():
     [
       ("datetime_handler", DatetimeHandler()),
       ("rainfall_handler", RainfallHandler()),
-      # TODO: implementar un pca
       ("scaler", StandardScaler()),
+      ("pca", PCA(n_components=0.95)),
     ]
   )
