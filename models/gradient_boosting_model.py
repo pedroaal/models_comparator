@@ -59,9 +59,9 @@ class GradientBoostingModel:
       "r2": r2_score(y, y_pred),
     }
 
-    print(f"Mean Squared Error: {metrics['mse']:.2f}")
-    print(f"Root Mean Squared Error: {metrics['rmse']:.2f}")
-    print(f"Mean Absolute Error: {metrics['mae']:.2f}")
-    print(f"R-squared: {metrics['r2']:.2f}")
+    print(f"Mean Squared Error: {metrics['mse']:.4f}")
+    print(f"Root Mean Squared Error: {metrics['rmse']:.4f}")
+    print(f"Mean Absolute Error: {metrics['mae']:.4f}")
+    print(f"R-squared: {metrics['r2']:.4f}")
 
     return metrics

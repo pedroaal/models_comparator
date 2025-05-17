@@ -28,9 +28,6 @@ class WeatherFeatureEngineer(BaseEstimator, TransformerMixin):
     X = X.assign(Year=X["DATETIME"].dt.year, Month=X["DATETIME"].dt.month, Hour=X["DATETIME"].dt.hour)
     X = X.drop(columns=["DATETIME"])
 
-    # quitar la variable de radiacion solar
-    X = X.drop(columns=["SOLARRAD"])
-
     X["HAS_RAINFALL"] = X["RAINFALL"].apply(lambda x: 1 if x > 0 else 0)
     return X
 

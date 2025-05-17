@@ -16,9 +16,7 @@ from .transformers import clean_pipeline
 
 class SVMModel:
   def __init__(self, path="svm_model.pkl"):
-    self.pipeline = Pipeline(
-      [("preprocessing", clean_pipeline()), ("svm", SVC())]
-    )
+    self.pipeline = Pipeline([("preprocessing", clean_pipeline()), ("svm", SVC())])
     self.model_path = path
 
   def train(self, data: pd.DataFrame, target_column: str):
@@ -46,11 +44,11 @@ class SVMModel:
       "confusion_matrix": confusion_matrix(y, y_pred),
     }
 
-    print(f"\nAccuracy: {metrics['accuracy']:.4f}")
-    print(f"\nPrecision: {metrics['precision']:.4f}")
-    print(f"\nRecall: {metrics['recall']:.4f}")
-    print(f"\nF1-score: {metrics['f1']:.4f}")
-    print("\nConfusion Matrix:\n")
+    print(f"Accuracy: {metrics['accuracy']:.4f}")
+    print(f"Precision: {metrics['precision']:.4f}")
+    print(f"Recall: {metrics['recall']:.4f}")
+    print(f"F1-score: {metrics['f1']:.4f}")
+    print("Confusion Matrix:")
     print(metrics["confusion_matrix"])
 
     return metrics

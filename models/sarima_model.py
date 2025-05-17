@@ -1,28 +1,47 @@
 # models/sarima_model.py
 import pandas as pd
+import joblib
+from sklearn.pipeline import Pipeline
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
+from .transformers import clean_pipeline
+
 
 class SARIMAModel:
-  def __init__(self, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12)):
-    self.order = order
-    self.seasonal_order = seasonal_order
+  def __init__(self, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12), path="sarima_model.pkl"):
+    self.pipeline = Pipeline(
+      [
+        ("preprocessing", clean_pipeline()),
+        (
+          "sarima",
+          SARIMAX(
+            order=order,
+            seasonal_order=seasonal_order,
+          ),
+        ),
+      ]
+    )
+    self.model_path = path
 
   def train(self, df: pd.DataFrame, target_column: str):
-    self.model = SARIMAX(
-      df[target_column],
-      order=self.order,
-      seasonal_order=self.seasonal_order,
-    )
-    self.model_fit = self.model.fit(disp=False)
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
 
-  def predict(self, steps: int):
-    forecast = self.model_fit.forecast(steps=steps)
-    return forecast
+    self.pipeline.fit(X, y)
+    joblib.dump(self.pipeline, self.model_path)
+
+  def predict(self, data: list[float]):
+    try:
+      loaded_model = joblib.load(self.model_path)
+      prediction = loaded_model.predict(data)
+      return prediction
+    except Exception as e:
+      print(f"Error loading model: {e}")
+      return [0.0]
 
   def evaluate(self, df: pd.DataFrame, target_column: str):
-    y_pred = self.model_fit.predict(start=0, end=len(df) - 1)
+    y_pred = self.pipeline.predict(start=0, end=len(df) - 1)
     y_true = df[target_column]
 
     metrics = {
@@ -31,8 +50,8 @@ class SARIMAModel:
       "r2": r2_score(y_true, y_pred),
     }
 
-    print(f"\nMSE: {metrics['mse']:.4f}")
-    print(f"\nMAE: {metrics['mae']:.4f}")
-    print(f"\nR2-score: {metrics['r2']:.4f}")
+    print(f"MSE: {metrics['mse']:.4f}")
+    print(f"MAE: {metrics['mae']:.4f}")
+    print(f"R2-score: {metrics['r2']:.4f}")
 
     return metrics
