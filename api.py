@@ -2,7 +2,7 @@ import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from models.gradient_boosting_model import GradientBoostingModel
+from models.mlp_model import MLPModel
 
 app = FastAPI()
 
@@ -37,7 +37,7 @@ def predict(data: Weather):
     dt.month,
     dt.hour,
   ]
-  model = GradientBoostingModel()
+  model = MLPModel()
   predictions = model.predict(predict_data)
   return {"prediction": predictions[0]}
 
