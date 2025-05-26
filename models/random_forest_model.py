@@ -51,8 +51,8 @@ class RandomForestModel:
       "r2": r2_score(y, y_pred),
     }
 
-    print(f"MSE: {metrics['mse']:.4f}")
-    print(f"MAE: {metrics['mae']:.4f}")
+    print(f"Mean Squared Error: {metrics['mse']:.4f}")
+    print(f"Mean Absolute Error: {metrics['mae']:.4f}")
     print(f"R2-score: {metrics['r2']:.4f}")
 
     return metrics

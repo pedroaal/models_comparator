@@ -42,16 +42,16 @@ class SARIMAModel:
 
   def evaluate(self, df: pd.DataFrame, target_column: str):
     y_pred = self.pipeline.predict(start=0, end=len(df) - 1)
-    y_true = df[target_column]
+    y = df[target_column]
 
     metrics = {
-      "mse": mean_squared_error(y_true, y_pred),
-      "mae": mean_absolute_error(y_true, y_pred),
-      "r2": r2_score(y_true, y_pred),
+      "mse": mean_squared_error(y, y_pred),
+      "mae": mean_absolute_error(y, y_pred),
+      "r2": r2_score(y, y_pred),
     }
 
-    print(f"MSE: {metrics['mse']:.4f}")
-    print(f"MAE: {metrics['mae']:.4f}")
+    print(f"Mean Squared Error: {metrics['mse']:.4f}")
+    print(f"Mean Absolute Error: {metrics['mae']:.4f}")
     print(f"R2-score: {metrics['r2']:.4f}")
 
     return metrics

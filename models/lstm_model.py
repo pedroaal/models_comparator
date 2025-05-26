@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import joblib
 from sklearn.pipeline import Pipeline
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
@@ -43,11 +44,16 @@ class LSTMModel:
 
   def evaluate(self, df: pd.DataFrame, target_column: str):
     y_pred = self.predict(df.drop(columns=[target_column]))
-    y_true = df[target_column]
-    mse = np.mean((y_true - y_pred) ** 2)
-    mae = np.mean(np.abs(y_true - y_pred))
-    r2 = 1 - (np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2))
-    print(f"MSE: {mse:.4f}")
-    print(f"MAE: {mae:.4f}")
-    print(f"R2-score: {r2:.4f}")
-    return mse, mae, r2
+    y = df[target_column]
+
+    metrics = {
+      "mse": mean_squared_error(y, y_pred),
+      "mae": mean_absolute_error(y, y_pred),
+      "r2": r2_score(y, y_pred),
+    }
+
+    print(f"Mean Squared Error: {metrics['mse']:.4f}")
+    print(f"Mean Absolute Error: {metrics['mae']:.4f}")
+    print(f"R2-score: {metrics['r2']:.4f}")
+
+    return metrics

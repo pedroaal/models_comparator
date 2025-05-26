@@ -3,12 +3,7 @@ import joblib
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import (
-  accuracy_score,
-  precision_score,
-  recall_score,
-  f1_score,
-)
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 from .transformers import clean_pipeline
 
@@ -41,15 +36,13 @@ class KNNModel:
     y_pred = model.predict(X)
 
     metrics = {
-      "accuracy": accuracy_score(y, y_pred),
-      "precision": precision_score(y, y_pred, average="weighted"),
-      "recall": recall_score(y, y_pred, average="weighted"),
-      "f1": f1_score(y, y_pred, average="weighted"),
+      "mse": mean_squared_error(y, y_pred),
+      "mae": mean_absolute_error(y, y_pred),
+      "r2": r2_score(y, y_pred),
     }
 
-    print(f"\nAccuracy: {metrics['accuracy']:.4f}")
-    print(f"\nPrecision: {metrics['precision']:.4f}")
-    print(f"\nRecall: {metrics['recall']:.4f}")
-    print(f"\nF1-score: {metrics['f1']:.4f}")
+    print(f"Mean Squared Error: {metrics['mse']:.4f}")
+    print(f"Mean Absolute Error: {metrics['mae']:.4f}")
+    print(f"R2-score: {metrics['r2']:.4f}")
 
     return metrics

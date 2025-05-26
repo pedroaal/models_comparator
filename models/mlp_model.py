@@ -17,14 +17,15 @@ class MLPModel:
         (
           "model",
           MLPRegressor(
-            hidden_layer_sizes=(64, 32),
+            hidden_layer_sizes=(16, 8),
             activation="relu",
             solver="adam",
+            alpha=0.5,
             random_state=28,
             learning_rate="adaptive",
             learning_rate_init=0.001,
-            max_iter=1000,
-            # early_stopping=True,
+            max_iter=500,
+            early_stopping=True,
           ),
         ),
       ]
@@ -60,8 +61,8 @@ class MLPModel:
       "r2": r2_score(y, y_pred),
     }
 
-    print(f"MSE: {metrics['mse']:.4f}")
-    print(f"MAE: {metrics['mae']:.4f}")
+    print(f"Mean Squared Error: {metrics['mse']:.4f}")
+    print(f"Mean Absolute Error: {metrics['mae']:.4f}")
     print(f"R2-score: {metrics['r2']:.4f}")
 
     return metrics
