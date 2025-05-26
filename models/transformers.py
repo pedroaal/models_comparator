@@ -1,7 +1,8 @@
 import pandas as pd
+import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -25,6 +26,15 @@ class DatetimeHandler(BaseEstimator, TransformerMixin):
 
     X["DATETIME"] = pd.to_datetime(X["DATETIME"], format="%d-%b-%Y %H:%M")
     X = X.assign(Year=X["DATETIME"].dt.year, Month=X["DATETIME"].dt.month, Hour=X["DATETIME"].dt.hour)
+
+    # hora como variable cíclica (0 a 23)
+    X["HORA_sin"] = np.sin(2 * np.pi * X["HORA"] / 24)
+    X["HORA_cos"] = np.cos(2 * np.pi * X["HORA"] / 24)
+
+    # mes como variable cíclica (1 a 12)
+    X["MES_sin"] = np.sin(2 * np.pi * X["MES"] / 12)
+    X["MES_cos"] = np.cos(2 * np.pi * X["MES"] / 12)
+
     X = X.drop(columns=["DATETIME"])
 
     return X
@@ -48,7 +58,7 @@ def clean_pipeline():
     [
       ("datetime_handler", DatetimeHandler()),
       ("rainfall_handler", RainfallHandler()),
-      ("scaler", StandardScaler()),
+      ("scaler", RobustScaler()),
       ("pca", PCA(n_components=0.95)),
     ]
   )
