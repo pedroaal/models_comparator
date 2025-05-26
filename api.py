@@ -54,7 +54,7 @@ def predict(data: Weather):
 
   model = MLPModel()
   predictions = model.predict(predict_df)
-  return {"prediction": predictions[0]}
+  return {"prediction": round(predictions[0], 4)}
 
 
 if __name__ == "__main__":
