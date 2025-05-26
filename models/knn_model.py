@@ -1,4 +1,3 @@
-import pandas as pd
 import joblib
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
@@ -18,9 +17,7 @@ class KNNModel:
     )
     self.model_path = path
 
-  def train(self, df: pd.DataFrame, target_column: str):
-    X = df.drop(columns=[target_column])
-    y = df[target_column]
+  def train(self, X, y):
     self.pipeline.fit(X, y)
     joblib.dump(self.pipeline, self.model_path)
 
@@ -28,10 +25,7 @@ class KNNModel:
     model = joblib.load(self.model_path)
     return model.predict(np.array(features))
 
-  def evaluate(self, df: pd.DataFrame, target_column: str):
-    X = df.drop(columns=[target_column])
-    y = df[target_column]
-
+  def evaluate(self, X, y):
     model = joblib.load(self.model_path)
     y_pred = model.predict(X)
 

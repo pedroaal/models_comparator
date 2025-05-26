@@ -1,5 +1,4 @@
 # models/sarima_model.py
-import pandas as pd
 import joblib
 from sklearn.pipeline import Pipeline
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -24,10 +23,7 @@ class SARIMAModel:
     )
     self.model_path = path
 
-  def train(self, df: pd.DataFrame, target_column: str):
-    X = df.drop(columns=[target_column])
-    y = df[target_column]
-
+  def train(self, X, y):
     self.pipeline.fit(X, y)
     joblib.dump(self.pipeline, self.model_path)
 
@@ -40,9 +36,9 @@ class SARIMAModel:
       print(f"Error loading model: {e}")
       return [0.0]
 
-  def evaluate(self, df: pd.DataFrame, target_column: str):
-    y_pred = self.pipeline.predict(start=0, end=len(df) - 1)
-    y = df[target_column]
+  def evaluate(self, X, y):
+    model = joblib.load(self.model_path)
+    y_pred = model.predict(X)
 
     metrics = {
       "mse": mean_squared_error(y, y_pred),

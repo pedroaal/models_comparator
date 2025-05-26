@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import joblib
 from sklearn.pipeline import Pipeline
@@ -26,9 +25,7 @@ class GradientBoostingModel:
     )
     self.model_path = path
 
-  def train(self, df: pd.DataFrame, target_col: str):
-    X = df.drop(columns=[target_col])
-    y = df[target_col]
+  def train(self, X, y):
     self.pipeline.fit(X, y)
     joblib.dump(self.pipeline, self.model_path)
 
@@ -44,10 +41,7 @@ class GradientBoostingModel:
       print(f"Error loading model: {e}")
       return [0.0]
 
-  def evaluate(self, df: pd.DataFrame, target_column: str):
-    X = df.drop(columns=[target_column])
-    y = df[target_column]
-
+  def evaluate(self, X, y):
     model = joblib.load(self.model_path)
     y_pred = model.predict(X)
 

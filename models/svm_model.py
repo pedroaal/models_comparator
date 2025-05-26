@@ -1,4 +1,3 @@
-import pandas as pd
 import joblib
 import numpy as np
 from sklearn.svm import SVC
@@ -13,9 +12,7 @@ class SVMModel:
     self.pipeline = Pipeline([("preprocessing", clean_pipeline()), ("svm", SVC())])
     self.model_path = path
 
-  def train(self, data: pd.DataFrame, target_column: str):
-    X = data.drop(columns=[target_column])
-    y = data[target_column]
+  def train(self, X, y):
     self.pipeline.fit(X, y)
     joblib.dump(self.pipeline, self.model_path)
 
@@ -23,10 +20,7 @@ class SVMModel:
     model = joblib.load(self.model_path)
     return model.predict(np.array(features))
 
-  def evaluate(self, df: pd.DataFrame, target_column: str):
-    X = df.drop(columns=[target_column])
-    y = df[target_column]
-
+  def evaluate(self, X, y):
     model = joblib.load(self.model_path)
     y_pred = model.predict(X)
 

@@ -1,5 +1,4 @@
 # models/lstm_model.py
-import pandas as pd
 import numpy as np
 import joblib
 from sklearn.pipeline import Pipeline
@@ -25,16 +24,7 @@ class LSTMModel:
     model.compile(loss="mean_squared_error", optimizer="adam")
     return model
 
-  def train(self, df: pd.DataFrame, target_column: str, epochs=100):
-    # scaler = MinMaxScaler()
-    # scaled_data = scaler.fit_transform(df)
-    # X = scaled_data[:, :-1]
-    # y = scaled_data[:, -1]
-    # X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
-
-    X = df.drop(columns=[target_column])
-    y = df[target_column]
-
+  def train(self, X, y, epochs=100):
     self.pipeline.fit(X, y, epochs=epochs, batch_size=32, verbose=2)
     joblib.dump(self.pipeline, self.model_path)
 
@@ -42,9 +32,9 @@ class LSTMModel:
     data = np.reshape(data, (data.shape[0], 1, data.shape[1]))
     return self.model.predict(data)
 
-  def evaluate(self, df: pd.DataFrame, target_column: str):
-    y_pred = self.predict(df.drop(columns=[target_column]))
-    y = df[target_column]
+  def evaluate(self, X, y):
+    model = joblib.load(self.model_path)
+    y_pred = model.predict(X)
 
     metrics = {
       "mse": mean_squared_error(y, y_pred),
