@@ -9,7 +9,7 @@ from .transformers import clean_pipeline
 
 
 class MLPModel:
-  def __init__(self, path="mlp_model.pkl"):
+  def __init__(self, path="mlp_model.joblib"):
     self.pipeline = Pipeline(
       [
         ("cleaning", clean_pipeline()),

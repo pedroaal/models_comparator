@@ -8,8 +8,10 @@ from .transformers import clean_pipeline
 
 
 class SVMModel:
-  def __init__(self, path="svm_model.pkl"):
-    self.pipeline = Pipeline([("preprocessing", clean_pipeline()), ("svm", SVC())])
+  def __init__(self, path="svm_model.joblib"):
+    self.pipeline = Pipeline(
+      [("preprocessing", clean_pipeline()), ("svm", SVC())]
+    )
     self.model_path = path
 
   def train(self, X, y):

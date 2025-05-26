@@ -9,7 +9,7 @@ from .transformers import clean_pipeline
 
 
 class RandomForestModel:
-  def __init__(self, path="rf_model.pkl"):
+  def __init__(self, path="rf_model.joblib"):
     self.pipeline = Pipeline(
       [
         ("cleaning", clean_pipeline()),

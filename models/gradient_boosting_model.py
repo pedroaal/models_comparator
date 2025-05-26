@@ -8,7 +8,7 @@ from .transformers import clean_pipeline
 
 
 class GradientBoostingModel:
-  def __init__(self, path="gb_model.pkl"):
+  def __init__(self, path="gb_model.joblib"):
     self.pipeline = Pipeline(
       [
         ("cleaning", clean_pipeline()),

@@ -8,7 +8,7 @@ from .transformers import clean_pipeline
 
 
 class KNNModel:
-  def __init__(self, path="knn_model.pkl"):
+  def __init__(self, path="knn_model.joblib"):
     self.pipeline = Pipeline(
       [
         ("preprocessing", clean_pipeline()),

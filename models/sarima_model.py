@@ -8,7 +8,12 @@ from .transformers import clean_pipeline
 
 
 class SARIMAModel:
-  def __init__(self, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12), path="sarima_model.pkl"):
+  def __init__(
+    self,
+    order=(1, 1, 1),
+    seasonal_order=(1, 1, 1, 12),
+    path="sarima_model.joblib",
+  ):
     self.pipeline = Pipeline(
       [
         ("preprocessing", clean_pipeline()),

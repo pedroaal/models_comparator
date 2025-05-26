@@ -10,11 +10,13 @@ from .transformers import clean_pipeline
 
 
 class LSTMModel:
-  def __init__(self, input_shape, output_shape, path="lstm_model.pkl"):
+  def __init__(self, input_shape, output_shape, path="lstm_model.joblib"):
     self.input_shape = input_shape
     self.output_shape = output_shape
     model = self._build_model()
-    self.pipeline = Pipeline([("preprocessing", clean_pipeline()), ("model", model())])
+    self.pipeline = Pipeline(
+      [("preprocessing", clean_pipeline()), ("model", model())]
+    )
     self.model_path = path
 
   def _build_model(self):
