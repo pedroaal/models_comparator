@@ -1,0 +1,15 @@
+POST http://localhost:8000/predict HTTP/1.1
+content-type: application/json
+
+{
+    "datetime": "26-Jan-2025 05:00",
+    "ambtemp": 12.5,
+    "cougm3": 0.1,
+    "no2ugm3": 15.1,
+    "o3ugm3": 17.5,
+    "pm25": 7.63,
+    "rainfall": 0,
+    "so2ugm3": -4.6,
+    "solarrad": 360,
+    "uv_index": 0
+}
