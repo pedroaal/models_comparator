@@ -1,8 +1,10 @@
+import joblib
 import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import RobustScaler
 
 
 def handle_negative_values(df):
@@ -14,9 +16,13 @@ def handle_negative_values(df):
 
 def handle_datetime(df):
   new_df = df.copy()
-  new_df["DATETIME"] = pd.to_datetime(new_df["DATETIME"], format="%d-%b-%Y %H:%M")
+  new_df["DATETIME"] = pd.to_datetime(
+    new_df["DATETIME"], format="%d-%b-%Y %H:%M"
+  )
   new_df = new_df.assign(
-    YEAR=new_df["DATETIME"].dt.year, MONTH=new_df["DATETIME"].dt.month, HOUR=new_df["DATETIME"].dt.hour
+    YEAR=new_df["DATETIME"].dt.year,
+    MONTH=new_df["DATETIME"].dt.month,
+    HOUR=new_df["DATETIME"].dt.hour,
   )
 
   # hora como variable cíclica (0 a 23)
@@ -39,6 +45,22 @@ def handle_rainfall(df):
   new_df = new_df.drop(columns=["RAINFALL"])
 
   return new_df
+
+
+# Fit and save the scaler
+def fit_scaler(df, path="scaler.joblib"):
+  scaler = RobustScaler()
+  scaler.fit(df)
+  joblib.dump(scaler, path)
+
+  return scaler
+
+
+# Load and use the scaler
+def transform_scaler(df, path="scaler.joblib"):
+  scaler = joblib.load(path)
+
+  return scaler.transform(df)
 
 
 class CustomTransformer(BaseEstimator, TransformerMixin):
