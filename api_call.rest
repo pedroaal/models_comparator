@@ -2,7 +2,7 @@ POST http://localhost:8000/predict HTTP/1.1
 content-type: application/json
 
 {
-    "datetime": "26-Jan-2025 05:00",
+    "datetime": "2025-01-13T23:00",
     "ambtemp": 12.5,
     "cougm3": 0.1,
     "no2ugm3": 15.1,

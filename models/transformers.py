@@ -14,11 +14,9 @@ def handle_negative_values(df):
   return new_df
 
 
-def handle_datetime(df):
+def handle_datetime(df, format="%d-%b-%Y %H:%M"):
   new_df = df.copy()
-  new_df["DATETIME"] = pd.to_datetime(
-    new_df["DATETIME"], format="%d-%b-%Y %H:%M"
-  )
+  new_df["DATETIME"] = pd.to_datetime(new_df["DATETIME"], format=format)
   new_df = new_df.assign(
     YEAR=new_df["DATETIME"].dt.year,
     MONTH=new_df["DATETIME"].dt.month,

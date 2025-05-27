@@ -1,10 +1,18 @@
 import pandas as pd
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from models import MLPModel, handle_datetime, handle_rainfall, transform_scaler
 
 app = FastAPI()
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=["*"],  # Allows all origins
+  allow_credentials=True,
+  allow_methods=["*"],  # Allows all methods
+  allow_headers=["*"],  # Allows all headers
+)
 
 numerical_features = [
   "COUGM3",
@@ -18,14 +26,12 @@ numerical_features = [
 
 class Weather(BaseModel):
   datetime: str
-  ambtemp: float
   cougm3: float
   no2ugm3: float
   o3ugm3: float
   pm25: float
   rainfall: float
   so2ugm3: float
-  solarrad: float
   uv_index: float
 
 
@@ -46,7 +52,7 @@ def predict(data: Weather):
     ]
   )
 
-  predict_df = handle_datetime(predict_df)
+  predict_df = handle_datetime(predict_df, "%Y-%m-%dT%H:%M")
   predict_df = handle_rainfall(predict_df)
   predict_df[numerical_features] = transform_scaler(
     predict_df[numerical_features]
