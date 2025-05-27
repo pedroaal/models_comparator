@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Data Collection</title>
+    <script src="https://cdn.tailwindcss.com" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'earth': {
+                            50: '#f0f9f0',
+                            100: '#dcf2dc',
+                            200: '#bce5bc',
+                            300: '#8dd18d',
+                            400: '#5cb85c',
+                            500: '#3a9a3a',
+                            600: '#2d7d2d',
+                            700: '#256325',
+                            800: '#1f4f1f',
+                            900: '#1a421a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gradient-to-br from-earth-50 to-blue-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-earth-800 mb-2">Environmental Data Collection</h1>
+            <p class="text-earth-600">Monitor ambient temperature and air quality parameters</p>
+            <div class="w-24 h-1 bg-earth-500 mx-auto mt-4 rounded" />
+        </div>
+
+        <!-- Main Form Container -->
+        <div class="max-w-4xl mx-auto">
+            <!-- Response Container -->
+            <div id="response-container" class="mt-8" />
+
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <!-- Form Header -->
+                <div class="bg-gradient-to-r from-earth-500 to-earth-600 px-8 py-6">
+                    <h2 class="text-2xl font-semibold text-white flex items-center">
+                        <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                        Data Entry Form
+                    </h2>
+                </div>
+
+                <!-- Form Body -->
+                <form id="environmental-form" class="p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- DateTime Field -->
+                        <div class="col-span-full">
+                            <label for="datetime" class="block text-sm font-semibold text-earth-700 mb-2">
+                                Date & Time
+                            </label>
+                            <input type="datetime-local" id="datetime" name="datetime" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+
+                        <!-- CO (μg/m³) -->
+                        <div>
+                            <label for="cougm3" class="block text-sm font-semibold text-earth-700 mb-2">
+                                CO (μg/m³)
+                            </label>
+                            <input type="number" id="cougm3" name="cougm3" step="0.01" placeholder="0.00" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+
+                        <!-- NO2 (μg/m³) -->
+                        <div>
+                            <label for="no2ugm3" class="block text-sm font-semibold text-earth-700 mb-2">
+                                NO₂ (μg/m³)
+                            </label>
+                            <input type="number" id="no2ugm3" name="no2ugm3" step="0.01" placeholder="0.00" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+
+                        <!-- O3 (μg/m³) -->
+                        <div>
+                            <label for="o3ugm3" class="block text-sm font-semibold text-earth-700 mb-2">
+                                O₃ (μg/m³)
+                            </label>
+                            <input type="number" id="o3ugm3" name="o3ugm3" step="0.01" placeholder="0.00" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+
+                        <!-- PM2.5 -->
+                        <div>
+                            <label for="pm25" class="block text-sm font-semibold text-earth-700 mb-2">
+                                PM2.5 (μg/m³)
+                            </label>
+                            <input type="number" id="pm25" name="pm25" step="0.01" placeholder="0.00" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+
+                        <!-- Rainfall -->
+                        <div>
+                            <label for="rainfall" class="block text-sm font-semibold text-earth-700 mb-2">
+                                Rainfall (mm)
+                            </label>
+                            <input type="number" id="rainfall" name="rainfall" step="0.01" placeholder="0.00" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+
+                        <!-- SO2 (μg/m³) -->
+                        <div>
+                            <label for="so2ugm3" class="block text-sm font-semibold text-earth-700 mb-2">
+                                SO₂ (μg/m³)
+                            </label>
+                            <input type="number" id="so2ugm3" name="so2ugm3" step="0.01" placeholder="0.00" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+
+                        <!-- UV Index -->
+                        <div>
+                            <label for="uv_index" class="block text-sm font-semibold text-earth-700 mb-2">
+                                UV Index
+                            </label>
+                            <input type="number" id="uv_index" name="uv_index" step="0.1" min="0" max="15"
+                                placeholder="0.0" required
+                                class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:ring-2 focus:ring-earth-500 focus:border-earth-500 transition-colors">
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="mt-8 flex justify-center">
+                        <button type="submit" id="submit-btn"
+                            class="bg-gradient-to-r from-earth-500 to-earth-600 hover:from-earth-600 hover:to-earth-700 text-white font-semibold py-4 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-earth-500 focus:ring-offset-2 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                            </svg>
+                            <span class="btn-text">Send Data</span>
+                        </button>
+                    </div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loading" class="hidden mt-4 text-center">
+                        <div class="inline-flex items-center">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-earth-500"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            <span class="text-earth-600">Processing data...</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Templates -->
+    <template id="success-template">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-earth-800">Prediction Complete</h3>
+            </div>
+
+            <div class="flex justify-center">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl text-center max-w-sm">
+                    <h4 class="text-lg font-semibold text-blue-800 mb-3">Ambient Temperature Prediction</h4>
+                    <p class="text-4xl font-bold text-blue-600 mb-2">
+                        <span class="prediction-value" />°C
+                    </p>
+                    <p class="text-sm text-blue-600">Based on environmental parameters</p>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg text-center">
+                <p class="text-sm text-gray-600">
+                    <strong>Processed at:</strong> <span class="timestamp" />
+                </p>
+            </div>
+        </div>
+    </template>
+
+    <template id="parse-error-template">
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-red-800 mb-2">Error Processing Response</h3>
+            <p class="text-red-600">Unable to parse server response</p>
+        </div>
+    </template>
+
+    <template id="api-error-template">
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                    </path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-red-800 mb-2">API Error</h3>
+            <p class="text-red-600">Status: <span class="error-status" / />
+                <p class="text-sm text-red-500 mt-2 error-message" />
+        </div>
+    </template>
+
+    <template id="connection-error-template">
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-red-800 mb-2">Connection Error</h3>
+            <p class="text-red-600">Unable to connect to API server</p>
+            <p class="text-sm text-red-500 mt-2">Please check if the server is running on localhost:8000</p>
+        </div>
+    </template>
+
+    <script>
+        $(document).ready(function () {
+            $('#environmental-form').on('submit', function (e) {
+                e.preventDefault();
+
+                // Show loading state
+                $('#loading').removeClass('hidden');
+                $('#submit-btn').prop('disabled', true);
+                $('.btn-text').text('Processing...');
+
+                // Collect form data
+                const formData = {};
+                $(this).find('input').each(function () {
+                    const name = $(this).attr('name');
+                    const value = $(this).val();
+
+                    // Convert numeric fields to numbers
+                    if ($(this).attr('type') === 'number') {
+                        formData[name] = parseFloat(value) || 0;
+                    } else {
+                        formData[name] = value;
+                    }
+                });
+
+                // Send JSON data to API
+                $.ajax({
+                    url: 'https://8000-01j7rcx14jtxewb0a80nyw7djy.cloudspaces.litng.ai/predict',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        showSuccessResponse(response);
+                    },
+                    error: function (xhr, status, error) {
+                        if (xhr.status === 0) {
+                            showConnectionError();
+                        } else {
+                            showApiError(xhr.status, xhr.statusText || error);
+                        }
+                    },
+                    complete: function () {
+                        // Hide loading state
+                        $('#loading').addClass('hidden');
+                        $('#submit-btn').prop('disabled', false);
+                        $('.btn-text').text('Send Data');
+                    }
+                });
+            });
+
+            function showSuccessResponse(response) {
+                try {
+                    const $successTemplate = $('#success-template').contents().clone();
+
+                    // Populate template with data
+                    $successTemplate.find('.prediction-value').text(response.prediction.toFixed(2));
+                    $successTemplate.find('.timestamp').text(new Date().toLocaleString());
+
+                    // Insert into response container
+                    $('#response-container').html($successTemplate);
+
+                } catch (error) {
+                    showParseError();
+                }
+            }
+
+            function showParseError() {
+                const $errorTemplate = $('#parse-error-template').contents().clone();
+                $('#response-container').html($errorTemplate);
+            }
+
+            function showApiError(status, message) {
+                const $apiErrorTemplate = $('#api-error-template').contents().clone();
+
+                // Populate error details
+                $apiErrorTemplate.find('.error-status').text(status);
+                $apiErrorTemplate.find('.error-message').text(message);
+
+                $('#response-container').html($apiErrorTemplate);
+            }
+
+            function showConnectionError() {
+                const $connectionErrorTemplate = $('#connection-error-template').contents().clone();
+                $('#response-container').html($connectionErrorTemplate);
+            }
+        });
+    </script>
+</body>
+
+</html>
