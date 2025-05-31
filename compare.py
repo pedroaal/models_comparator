@@ -3,7 +3,6 @@ from sklearn.model_selection import train_test_split
 
 
 from models import (
-  GradientBoostingModel,
   RandomForestModel,
   MLPModel,
   fit_scaler,
@@ -50,12 +49,6 @@ def main():
   # model = SVMModel()
   # model.train(X_train, y_train)
   # model.evaluate(X_test, y_test)
-
-  # # Run gradient boost model
-  print("\n=== Gradient boost ===")
-  model = GradientBoostingModel()
-  model.train(X_train, y_train)
-  model.evaluate(X_test, y_test)
 
   # # Run random forest model
   print("\n=== Random Forest ===")
