@@ -4,8 +4,6 @@ from sklearn.pipeline import Pipeline
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-from .transformers import clean_pipeline
-
 
 class SARIMAModel:
   def __init__(
@@ -14,7 +12,7 @@ class SARIMAModel:
     seasonal_order=(1, 1, 1, 12),
     path="sarima_model.joblib",
   ):
-    self.pipeline = Pipeline(
+    self.model = Pipeline(
       [
         ("preprocessing", clean_pipeline()),
         (
@@ -29,8 +27,8 @@ class SARIMAModel:
     self.model_path = path
 
   def train(self, X, y):
-    self.pipeline.fit(X, y)
-    joblib.dump(self.pipeline, self.model_path)
+    self.model.fit(X, y)
+    joblib.dump(self.model, self.model_path)
 
   def predict(self, data: list[float]):
     try:

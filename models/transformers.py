@@ -72,11 +72,3 @@ class CustomTransformer(BaseEstimator, TransformerMixin):
     X = handle_datetime(X)
     X = handle_rainfall(X)
     return X
-
-
-def clean_pipeline():
-  return Pipeline(
-    [
-      ("pca", PCA(n_components=0.95)),
-    ]
-  )

@@ -6,15 +6,13 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
-from .transformers import clean_pipeline
-
 
 class LSTMModel:
   def __init__(self, input_shape, output_shape, path="lstm_model.joblib"):
     self.input_shape = input_shape
     self.output_shape = output_shape
     model = self._build_model()
-    self.pipeline = Pipeline(
+    self.model = Pipeline(
       [("preprocessing", clean_pipeline()), ("model", model())]
     )
     self.model_path = path
@@ -27,8 +25,8 @@ class LSTMModel:
     return model
 
   def train(self, X, y, epochs=100):
-    self.pipeline.fit(X, y, epochs=epochs, batch_size=32, verbose=2)
-    joblib.dump(self.pipeline, self.model_path)
+    self.model.fit(X, y, epochs=epochs, batch_size=32, verbose=2)
+    joblib.dump(self.model, self.model_path)
 
   def predict(self, data: np.array):
     data = np.reshape(data, (data.shape[0], 1, data.shape[1]))

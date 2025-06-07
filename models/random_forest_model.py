@@ -2,28 +2,17 @@
 import joblib
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
-from .transformers import clean_pipeline
 
 
 class RandomForestModel:
   def __init__(self, path="rf_model.joblib"):
-    self.pipeline = Pipeline(
-      [
-        ("cleaning", clean_pipeline()),
-        (
-          "model",
-          RandomForestRegressor(n_estimators=100, random_state=28),
-        ),
-      ]
-    )
+    self.model = RandomForestRegressor(n_estimators=100, random_state=28)
     self.model_path = path
 
   def train(self, X, y):
-    self.pipeline.fit(X, y)
-    joblib.dump(self.pipeline, self.model_path)
+    self.model.fit(X, y)
+    joblib.dump(self.model, self.model_path)
 
   def predict(self, data: list[float]):
     data_array = np.array(data).reshape(1, -1)

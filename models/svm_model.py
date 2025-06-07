@@ -1,22 +1,17 @@
 import joblib
 import numpy as np
-from sklearn.svm import SVC
-from sklearn.pipeline import Pipeline
+from sklearn.svm import OneClassSVM
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
-from .transformers import clean_pipeline
 
 
 class SVMModel:
   def __init__(self, path="svm_model.joblib"):
-    self.pipeline = Pipeline(
-      [("preprocessing", clean_pipeline()), ("svm", SVC())]
-    )
+    self.model = OneClassSVM(nu=0.5, kernel="rbf", gamma="scale")
     self.model_path = path
 
-  def train(self, X, y):
-    self.pipeline.fit(X, y)
-    joblib.dump(self.pipeline, self.model_path)
+  def train(self, X):
+    self.model.fit(X)
+    joblib.dump(self.model, self.model_path)
 
   def predict(self, features: list):
     model = joblib.load(self.model_path)

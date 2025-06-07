@@ -1,18 +1,17 @@
 # models/mlp_model.py
 import joblib
 import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
-from .transformers import clean_pipeline
 
 
 class MLPModel:
   def __init__(self, path="mlp_model.joblib"):
-    self.pipeline = Pipeline(
+    self.model = Pipeline(
       [
-        ("cleaning", clean_pipeline()),
+        ("pca", PCA(n_components=8)),
         (
           "model",
           MLPRegressor(
@@ -32,8 +31,8 @@ class MLPModel:
     self.model_path = path
 
   def train(self, X, y):
-    self.pipeline.fit(X, y)
-    joblib.dump(self.pipeline, self.model_path)
+    self.model.fit(X, y)
+    joblib.dump(self.model, self.model_path)
 
   def predict(self, data: list[float]):
     data_array = np.array(data).reshape(1, -1)
