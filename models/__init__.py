@@ -1,6 +1,7 @@
-from .svm_model import SVMModel
-from .random_forest_model import RandomForestModel
+from .dbscan_model import DBSCANModel
 from .sarima_model import SARIMAModel
+from .random_forest_model import RandomForestModel
+from .svm_model import SVMModel
 from .lstm_model import LSTMModel
 from .mlp_model import MLPModel
 from .transformers import (
@@ -17,9 +18,10 @@ __all__ = [
   "handle_rainfall",
   "fit_scaler",
   "transform_scaler",
-  "SVMModel",
-  "RandomForestModel",
+  "DBSCANModel",
   "SARIMAModel",
+  "RandomForestModel",
+  "SVMModel",
   "LSTMModel",
   "MLPModel",
 ]
