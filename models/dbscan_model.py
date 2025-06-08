@@ -1,10 +1,19 @@
 import joblib
 import numpy as np
+import pandas as pd
+from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import (
   silhouette_score,
-  adjusted_rand_score,
   calinski_harabasz_score,
+)
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import (
+  confusion_matrix,
+  roc_curve,
+  auc,
+  classification_report,
 )
 
 
@@ -15,7 +24,7 @@ class DBSCANModel:
     self.labels_ = None
 
   def train(self, X):
-    self.model.fit_predict(X)
+    self.labels_ = self.model.fit_predict(X)
     # Save the fitted model and labels
     model_data = {
       "labels": self.labels_,
@@ -55,7 +64,7 @@ class DBSCANModel:
     # In practice, you'd implement distance-based classification
     return np.array([-1] * len(X_new))
 
-  def evaluate(self, X, y=None):
+  def evaluate(self, X):
     """
     Evaluate DBSCAN clustering performance
     For anomaly detection, y can be true anomaly labels if available
@@ -94,18 +103,11 @@ class DBSCANModel:
     else:
       metrics["calinski_harabasz_score"] = 0
 
-    # If true labels are provided, calculate ARI
-    if y is not None:
-      metrics["adjusted_rand_score"] = adjusted_rand_score(y, labels)
-
     print(f"Number of clusters: {metrics['n_clusters']}")
     print(f"Number of noise points: {metrics['n_noise_points']}")
     print(f"Noise ratio: {metrics['noise_ratio']:.4f}")
     print(f"Silhouette Score: {metrics['silhouette_score']:.4f}")
     print(f"Calinski-Harabasz Score: {metrics['calinski_harabasz_score']:.4f}")
-
-    if y is not None:
-      print(f"Adjusted Rand Score: {metrics['adjusted_rand_score']:.4f}")
 
     return metrics
 
@@ -140,3 +142,126 @@ class DBSCANModel:
         cluster_info[f"cluster_{label}"] = np.sum(labels == label)
 
     return cluster_info
+
+  def plot_results(self, X, y_true=None, save_path="dbscan_results.png"):
+    """
+    Plot results for DBSCAN clustering
+    """
+    model_data = joblib.load(self.model_path)
+    labels = model_data["labels"]
+
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    fig.suptitle("DBSCAN Clustering Results", fontsize=16)
+
+    # Plot 1: Cluster visualization (2D PCA)
+    if X.shape[1] > 2:
+      pca = PCA(n_components=2)
+      X_pca = pca.fit_transform(X)
+    else:
+      X_pca = X
+
+    unique_labels = set(labels)
+    colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
+
+    for k, col in zip(unique_labels, colors):
+      if k == -1:
+        # Black used for noise
+        col = "black"
+        marker = "x"
+        label = "Noise"
+      else:
+        marker = "o"
+        label = f"Cluster {k}"
+
+      class_member_mask = labels == k
+      xy = X_pca[class_member_mask]
+      axes[0, 0].scatter(
+        xy[:, 0], xy[:, 1], c=[col], marker=marker, alpha=0.6, s=50, label=label
+      )
+
+    axes[0, 0].set_xlabel("First Principal Component")
+    axes[0, 0].set_ylabel("Second Principal Component")
+    axes[0, 0].set_title("DBSCAN Clustering Visualization")
+    axes[0, 0].legend()
+
+    # Plot 2: Cluster sizes
+    cluster_info = self.get_clusters_info()
+    cluster_names = list(cluster_info.keys())
+    cluster_sizes = list(cluster_info.values())
+
+    axes[0, 1].bar(cluster_names, cluster_sizes, color="skyblue")
+    axes[0, 1].set_xlabel("Clusters")
+    axes[0, 1].set_ylabel("Number of Points")
+    axes[0, 1].set_title("Cluster Sizes")
+    axes[0, 1].tick_params(axis="x", rotation=45)
+
+    # Plot 3: Confusion Matrix (if true labels provided)
+    if y_true is not None:
+      # Convert clustering labels to anomaly detection labels
+      y_pred_anomaly = (labels == -1).astype(int)
+      y_true_anomaly = y_true.astype(int)
+
+      cm = confusion_matrix(y_true_anomaly, y_pred_anomaly)
+      sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=axes[1, 0])
+      axes[1, 0].set_xlabel("Predicted (0=Normal, 1=Anomaly)")
+      axes[1, 0].set_ylabel("Actual (0=Normal, 1=Anomaly)")
+      axes[1, 0].set_title("Confusion Matrix (Anomaly Detection)")
+    else:
+      axes[1, 0].text(
+        0.5,
+        0.5,
+        "No true labels provided",
+        horizontalalignment="center",
+        verticalalignment="center",
+      )
+      axes[1, 0].set_title("Confusion Matrix (N/A)")
+
+    # Plot 4: ROC Curve (if true labels provided)
+    if y_true is not None:
+      y_pred_anomaly = (labels == -1).astype(int)
+      y_true_anomaly = y_true.astype(int)
+
+      fpr, tpr, _ = roc_curve(y_true_anomaly, y_pred_anomaly)
+      roc_auc = auc(fpr, tpr)
+
+      axes[1, 1].plot(
+        fpr,
+        tpr,
+        color="darkorange",
+        lw=2,
+        label=f"ROC curve (AUC = {roc_auc:.2f})",
+      )
+      axes[1, 1].plot([0, 1], [0, 1], color="navy", lw=2, linestyle="--")
+      axes[1, 1].set_xlim([0.0, 1.0])
+      axes[1, 1].set_ylim([0.0, 1.05])
+      axes[1, 1].set_xlabel("False Positive Rate")
+      axes[1, 1].set_ylabel("True Positive Rate")
+      axes[1, 1].set_title("ROC Curve (Anomaly Detection)")
+      axes[1, 1].legend(loc="lower right")
+    else:
+      axes[1, 1].text(
+        0.5,
+        0.5,
+        "No true labels provided",
+        horizontalalignment="center",
+        verticalalignment="center",
+      )
+      axes[1, 1].set_title("ROC Curve (N/A)")
+
+    plt.tight_layout()
+
+    if save_path:
+      plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+    plt.show()
+
+    # Classification Report (if true labels provided)
+    if y_true is not None:
+      y_pred_anomaly = (labels == -1).astype(int)
+      y_true_anomaly = y_true.astype(int)
+      print("\nAnomaly Detection Classification Report:")
+      print(
+        classification_report(
+          y_true_anomaly, y_pred_anomaly, target_names=["Normal", "Anomaly"]
+        )
+      )
