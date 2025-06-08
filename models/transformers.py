@@ -14,7 +14,7 @@ def handle_negative_values(df):
   return new_df
 
 
-def handle_datetime(df, format="%d-%b-%Y %H:%M"):
+def handle_datetime(df, format="%d-%b-%Y %H:%M", remove_date=True):
   new_df = df.copy()
   new_df["DATETIME"] = pd.to_datetime(new_df["DATETIME"], format=format)
   new_df = new_df.assign(
@@ -31,7 +31,8 @@ def handle_datetime(df, format="%d-%b-%Y %H:%M"):
   new_df["MONTH_SIN"] = np.sin(2 * np.pi * new_df["MONTH"] / 12)
   new_df["MONTH_COS"] = np.cos(2 * np.pi * new_df["MONTH"] / 12)
 
-  new_df = new_df.drop(columns=["DATETIME"])
+  if remove_date:
+    new_df = new_df.drop(columns=["DATETIME"])
 
   return new_df
 
@@ -59,16 +60,3 @@ def transform_scaler(df, path="scaler.joblib"):
   scaler = joblib.load(path)
 
   return scaler.transform(df)
-
-
-class CustomTransformer(BaseEstimator, TransformerMixin):
-  def __init__(self):
-    pass
-
-  def fit(self, X, y=None):
-    return self
-
-  def transform(self, X):
-    X = handle_datetime(X)
-    X = handle_rainfall(X)
-    return X
