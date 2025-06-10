@@ -85,12 +85,12 @@ def run_mlp_model(X_train, X_test, y_train, y_test, skip=False):
 
   print("\n=== MLP Classifier ===")
   model = MLPModel()
-  model.get_best_estimator(
-    pd.concat([X_train, X_test]), pd.concat([y_train, y_test])
-  )
-  # model.train(X_train, y_train)
-  # model.evaluate(X_test, y_test)
-  # model.plot_results(X_test, y_test)
+  # model.get_best_estimator(
+  #   pd.concat([X_train, X_test]), pd.concat([y_train, y_test])
+  # )
+  model.train(X_train, y_train)
+  model.evaluate(X_test, y_test)
+  model.plot_results(X_test, y_test)
 
 
 def main():
