@@ -59,6 +59,9 @@ def run_svm_model(X_train, X_test, y_train, y_test, skip=False):
 
   print("\n=== Support vector machine ===")
   model = SVMModel()
+  # model.get_best_estimator(
+  #   pd.concat([X_train, X_test]), pd.concat([y_train, y_test])
+  # )
   model.train(X_train, y_train)
   model.evaluate(X_test, y_test)
   model.plot_results(X_test, y_test)
@@ -82,9 +85,12 @@ def run_mlp_model(X_train, X_test, y_train, y_test, skip=False):
 
   print("\n=== MLP Classifier ===")
   model = MLPModel()
-  model.train(X_train, y_train)
-  model.evaluate(X_test, y_test)
-  model.plot_results(X_test, y_test)
+  model.get_best_estimator(
+    pd.concat([X_train, X_test]), pd.concat([y_train, y_test])
+  )
+  # model.train(X_train, y_train)
+  # model.evaluate(X_test, y_test)
+  # model.plot_results(X_test, y_test)
 
 
 def main():
@@ -95,8 +101,9 @@ def main():
   print("\n=== Initial dataset ===")
   print(df.head())
 
-  target_column = "AMBTEMP"
+  target_column = "UV_INDEX"
   numerical_features = [
+    "AMBTEMP",
     "COUGM3",
     "NO2UGM3",
     "O3UGM3",
@@ -130,11 +137,6 @@ def main():
 
   series = df_scaled[target_column].dropna()
 
-  model = SVMModel()
-  model.get_best_estimator(
-    pd.concat([X_train, X_test]), pd.concat([y_train, y_test])
-  )
-
   # Anomaly detector models
   run_dbscan_model(df_scaled, skip=True)
   run_sarima_model(series, target_column, skip=True)
@@ -150,7 +152,7 @@ def main():
     window_size=24,
     skip=True,
   )
-  run_mlp_model(X_train, X_test, y_train, y_test, skip=True)
+  run_mlp_model(X_train, X_test, y_train, y_test, skip=False)
 
 
 if __name__ == "__main__":
