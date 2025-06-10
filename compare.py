@@ -109,7 +109,6 @@ def main():
     "O3UGM3",
     "PM25",
     "SO2UGM3",
-    "UV_INDEX",
   ]
 
   df = handle_datetime(df)
