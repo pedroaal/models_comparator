@@ -142,7 +142,7 @@ def main():
 
   # Predictive models
   run_random_forest_model(X_train, X_test, y_train, y_test, skip=True)
-  run_svm_model(X_train, X_test, y_train, y_test, skip=True)
+  run_svm_model(X_train, X_test, y_train, y_test, skip=False)
   run_lstm_model(
     X_train,
     X_test,
@@ -151,7 +151,7 @@ def main():
     window_size=24,
     skip=True,
   )
-  run_mlp_model(X_train, X_test, y_train, y_test, skip=False)
+  run_mlp_model(X_train, X_test, y_train, y_test, skip=True)
 
 
 if __name__ == "__main__":

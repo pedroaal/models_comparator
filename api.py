@@ -15,24 +15,26 @@ app.add_middleware(
 )
 
 numerical_features = [
+  "AMBTEMP",
   "COUGM3",
   "NO2UGM3",
   "O3UGM3",
   "PM25",
   "SO2UGM3",
-  "UV_INDEX",
+  # "UV_INDEX",
 ]
 
 
 class Weather(BaseModel):
   datetime: str
+  ambtemp: float
   cougm3: float
   no2ugm3: float
   o3ugm3: float
   pm25: float
   rainfall: float
   so2ugm3: float
-  uv_index: float
+  # uv_index: float
 
 
 @app.post("/predict")
@@ -41,13 +43,14 @@ def predict(data: Weather):
     [
       {
         "DATETIME": data.datetime,
+        "AMBTEMP": data.ambtemp,
         "COUGM3": data.cougm3,
         "NO2UGM3": data.no2ugm3,
         "O3UGM3": data.o3ugm3,
         "PM25": data.pm25,
         "RAINFALL": data.rainfall,
         "SO2UGM3": data.so2ugm3,
-        "UV_INDEX": data.uv_index,
+        # "UV_INDEX": data.uv_index,
       }
     ]
   )

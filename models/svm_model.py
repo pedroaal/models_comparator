@@ -16,7 +16,7 @@ from sklearn.metrics import (
 
 class SVMModel:
   def __init__(self, path="svm_model.joblib"):
-    self.model = SVR(kernel="rbf")
+    self.model = SVR(kernel="rbf", C=100, epsilon=0.5, gamma="auto")
     self.model_path = path
 
   def train(self, X, y):
@@ -50,36 +50,24 @@ class SVMModel:
       {
         # RBF Kernel (Primary recommendation)
         "kernel": ["rbf"],
-        "C": [0.1, 1, 10, 100, 1000],
-        "gamma": ["scale", "auto", 0.001, 0.01, 0.1, 1, 10],
-        "epsilon": [0.01, 0.1, 0.2, 0.5, 1.0],
-      },
-      {
-        # Linear Kernel (Alternative)
-        "kernel": ["linear"],
-        "C": [0.1, 1, 10, 100, 1000],
-        "epsilon": [0.01, 0.1, 0.2, 0.5, 1.0],
-      },
-      {
-        # Polynomial Kernel (For comparison)
-        "kernel": ["poly"],
-        "C": [0.1, 1, 10, 100],
-        "degree": [2, 3, 4],
-        "gamma": ["scale", "auto", 0.01, 0.1, 1],
-        "epsilon": [0.01, 0.1, 0.2],
+        "C": [10, 100, 1000],
+        "epsilon": [0.2, 0.5, 1.0],
+        "gamma": ["scale", "auto", 0.001],
       },
     ]
 
     grid_search = GridSearchCV(
       model,
       param_grid,
-      cv=5,
-      scoring="r2",
-      n_jobs=-1,
-      verbose=1,
+      cv=3,
+      scoring="neg_mean_squared_error",
+      n_jobs=1,
+      verbose=2,
     )
 
     grid_search.fit(X, y)
+
+    print("Best parameters found: ", grid_search.best_params_)
 
     return grid_search.best_estimator_
 

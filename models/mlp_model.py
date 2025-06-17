@@ -7,6 +7,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
+from sklearn.model_selection import GridSearchCV
 import seaborn as sns
 from sklearn.metrics import (
   confusion_matrix,
@@ -68,6 +69,46 @@ class MLPModel:
     print(f"R2-score: {metrics['r2']:.4f}")
 
     return metrics
+
+  def get_best_estimator(self, X, y):
+    model = MLPRegressor(
+      hidden_layer_sizes=(16, 8),
+      activation="relu",
+      solver="adam",
+      alpha=0.5,
+      random_state=28,
+      learning_rate="adaptive",
+      learning_rate_init=0.001,
+      max_iter=500,
+      early_stopping=True,
+    )
+
+    param_grid = [
+      {
+        "hidden_layer_sizes": [(8, 4), (16, 8), (32, 16), (64, 32), (128, 64)],
+        "activation": ["relu", "tanh"],
+        "solver": ["adam", "lbfgs"],
+        "alpha": [0.001, 0.01, 0.1, 0.5],
+        "learning_rate": ["constant", "adaptive"],
+        "learning_rate_init": [0.001, 0.01, 0.1],
+        "max_iter": [300, 500, 1000],
+      },
+    ]
+
+    grid_search = GridSearchCV(
+      model,
+      param_grid,
+      cv=3,
+      scoring="neg_mean_squared_error",
+      n_jobs=1,
+      verbose=2,
+    )
+
+    grid_search.fit(X, y)
+
+    print("Best parameters found: ", grid_search.best_params_)
+
+    return grid_search.best_estimator_
 
   def plot_results(
     self, X, y_true, save_path="mlp_results.png", task_type="regression"
