@@ -2,8 +2,10 @@
 import joblib
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import time
 
 
 class SARIMAModel:
@@ -15,51 +17,48 @@ class SARIMAModel:
     self.model_path = path
     self.target_column = target_column
     self.anomalies = None
+    self.model = None
 
-  def train(self, X):
+  def train(self, X, y):
     model = SARIMAX(
-      X,
+      y,
+      exog=X,
       order=(2, 0, 2),
       seasonal_order=(1, 1, 1, 12),
       enforce_stationarity=False,
       enforce_invertibility=False,
     )
-    model.fit(disp=False)
+    start_time = time.time()
+    model = model.fit(disp=False)
+    end_time = time.time()
+    print(f"Sarima training completed in {end_time - start_time:.2f} seconds")
+    self.model = model
     joblib.dump(model, self.model_path)
 
-  def predict(self, data: list[float]):
+  def predict(self, X: list[float]):
     try:
       loaded_model = joblib.load(self.model_path)
-      prediction = loaded_model.predict(data)
-      return prediction
+      prediction = loaded_model.get_forecast(steps=len(X), exog=X)
+      return prediction.predicted_mean
     except Exception as e:
       print(f"Error loading model: {e}")
       return [0.0]
 
-  def evaluate(self, X):
-    model = joblib.load(self.model_path)
+  def evaluate(self, X, y):
+    forecast_result = self.model.get_forecast(steps=len(y), exog=X)
+    y_pred = forecast_result.predicted_mean
 
-    n_periods = len(X)
-    forecast_res = model.get_forecast(steps=n_periods)
-    forecast = forecast_res.predicted_mean
-    pred_intervals = forecast_res.conf_int(alpha=0.05)
+    metrics = {
+      "mse": mean_squared_error(y, y_pred),
+      "mae": mean_absolute_error(y, y_pred),
+      "r2": r2_score(y, y_pred),
+    }
 
-    # Extract actual values
-    actual_values = X.values
-    lower_bound = pred_intervals.iloc[:, 0].values
-    upper_bound = pred_intervals.iloc[:, 1].values
+    print(f"Mean Squared Error: {metrics['mse']:.4f}")
+    print(f"Mean Absolute Error: {metrics['mae']:.4f}")
+    print(f"R2-score: {metrics['r2']:.4f}")
 
-    # Identify anomalies
-    anomalies_idx = (actual_values < lower_bound) | (
-      actual_values > upper_bound
-    )
-
-    print(f"\nAnomaly Detection Results:")
-    print(f"Total observations: {len(X)}")
-    print(f"Anomalies detected: {anomalies_idx.sum()}")
-    print(f"Anomaly rate: {(anomalies_idx.sum() / len(X) * 100):.2f}%")
-
-    return anomalies_idx
+    return metrics
 
   def find_sarima_parameters(self, series, seasonal_period=12):
     """Find optimal SARIMA parameters using grid search"""
@@ -108,99 +107,27 @@ class SARIMAModel:
 
     return best_params, best_seasonal_params
 
-  def plot_results(self, df, figsize=(15, 12)):
-    """Plot the results of anomaly detection"""
-    fig, axes = plt.subplots(4, 1, figsize=figsize)
+  def plot_results(self, figsize=(15, 12), save_path="sarima_results.png"):
+    # Residual diagnostics
+    residuals = self.model.resid
+    plt.figure(figsize=figsize)
 
-    # Plot 1: Original series with anomalies
-    axes[0].plot(
-      df.index, df[self.target_column], "b-", label="Actual", alpha=0.7
-    )
-    axes[0].plot(df.index, model.fittedvalues, "r-", label="Fitted", alpha=0.7)
+    plt.subplot(2, 2, 1)
+    plt.plot(residuals)
+    plt.title("Residuals")
 
-    # Highlight anomalies
-    anomaly_points = df[df["is_anomaly"]]
-    axes[0].scatter(
-      anomaly_points.index,
-      anomaly_points[self.target_column],
-      color="red",
-      s=50,
-      label="Anomalies",
-      zorder=5,
-    )
+    plt.subplot(2, 2, 2)
+    plt.hist(residuals, bins=20)
+    plt.title("Residuals Distribution")
 
-    axes[0].fill_between(
-      df.index,
-      df["lower_bound"],
-      df["upper_bound"],
-      alpha=0.2,
-      color="gray",
-      label="Confidence Interval",
-    )
-    axes[0].set_title(f"{self.target_column} - Actual vs Fitted with Anomalies")
-    axes[0].legend()
-    axes[0].grid(True, alpha=0.3)
+    plt.subplot(2, 2, 3)
+    plot_acf(residuals, ax=plt.gca(), lags=20)
 
-    # Plot 2: Residuals
-    axes[1].plot(df.index, self.residuals, "g-", alpha=0.7)
-    axes[1].axhline(y=0, color="black", linestyle="--", alpha=0.8)
-    axes[1].set_title("Residuals")
-    axes[1].grid(True, alpha=0.3)
-
-    # Plot 3: Anomaly scores
-    axes[2].plot(df.index, df["anomaly_score"], "purple", alpha=0.7)
-    axes[2].scatter(
-      anomaly_points.index,
-      anomaly_points["anomaly_score"],
-      color="red",
-      s=50,
-      zorder=5,
-    )
-    axes[2].set_title("Anomaly Scores")
-    axes[2].grid(True, alpha=0.3)
-
-    # Plot 4: ACF of residuals
-    plot_acf(self.residuals.dropna(), ax=axes[3], lags=20)
-    axes[3].set_title("ACF of Residuals")
+    plt.subplot(2, 2, 4)
+    plot_pacf(residuals, ax=plt.gca(), lags=20)
 
     plt.tight_layout()
+
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
     plt.show()
-
-  def get_anomaly_summary(self):
-    """Get summary of detected anomalies"""
-    if self.anomalies is None:
-      print("No anomalies detected yet. Run detect_anomalies first.")
-      return None
-
-    anomaly_data = self.anomalies[self.anomalies["is_anomaly"]].copy()
-
-    if len(anomaly_data) == 0:
-      print("No anomalies detected in the data.")
-      return None
-
-    summary = {
-      "anomaly_dates": anomaly_data.index.tolist(),
-      "anomaly_values": anomaly_data[self.target_column].tolist(),
-      "predicted_values": anomaly_data["predicted"].tolist(),
-      "anomaly_scores": anomaly_data["anomaly_score"].tolist(),
-      "anomaly_count": len(anomaly_data),
-      "anomaly_rate": len(anomaly_data) / len(self.anomalies) * 100,
-    }
-
-    print("Anomaly Summary:")
-    print("-" * 50)
-    for i, (date, actual, predicted, score) in enumerate(
-      zip(
-        summary["anomaly_dates"],
-        summary["anomaly_values"],
-        summary["predicted_values"],
-        summary["anomaly_scores"],
-      )
-    ):
-      print(
-        f"Anomaly {i + 1}: {date.strftime('%Y-%m')} | "
-        f"Actual: {actual:.2f} | Predicted: {predicted:.2f} | "
-        f"Score: {score:.2f}"
-      )
-
-    return summary
