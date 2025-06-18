@@ -5,6 +5,7 @@ from keras.layers import LSTM, Dense, Dropout
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.models import load_model
+import time
 
 
 class LSTMModel:
@@ -41,6 +42,7 @@ class LSTMModel:
     )
 
     X, y = self.create_sequences(X, y)
+    start_time = time.time()
     self.model.fit(
       X,
       y,
@@ -50,6 +52,8 @@ class LSTMModel:
       callbacks=[early_stopping, reduce_lr],
       verbose=1,
     )
+    end_time = time.time()
+    print(f"LSTM training completed in {end_time - start_time:.2f} seconds")
     self.model.save(self.model_path)
 
   def predict(self, data):

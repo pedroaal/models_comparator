@@ -9,6 +9,7 @@ from sklearn.metrics import (
 )
 import matplotlib.pyplot as plt
 import seaborn as sns
+import time
 from sklearn.metrics import (
   confusion_matrix,
   roc_curve,
@@ -24,7 +25,10 @@ class DBSCANModel:
     self.labels_ = None
 
   def train(self, X):
+    start_time = time.time()
     self.labels_ = self.model.fit_predict(X)
+    end_time = time.time()
+    print(f"DBSCAN training completed in {end_time - start_time:.2f} seconds")
     # Save the fitted model and labels
     model_data = {
       "labels": self.labels_,

@@ -12,6 +12,7 @@ from sklearn.metrics import (
   auc,
   classification_report,
 )
+import time
 
 
 class SVMModel:
@@ -20,7 +21,10 @@ class SVMModel:
     self.model_path = path
 
   def train(self, X, y):
+    start_time = time.time()
     self.model.fit(X, y)
+    end_time = time.time()
+    print(f"SVM training completed in {end_time - start_time:.2f} seconds")
     joblib.dump(self.model, self.model_path)
 
   def predict(self, features: list):
