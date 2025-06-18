@@ -97,7 +97,6 @@ def run_mlp_model(X_train, X_test, y_train, y_test, skip=False):
 
 def main():
   df = pd.read_csv("data.csv")
-  df = df.drop(columns=["SOLARRAD"])
   df.dropna(inplace=True)
 
   print("\n=== Initial dataset ===")
