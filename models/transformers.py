@@ -8,42 +8,49 @@ from sklearn.preprocessing import RobustScaler
 
 
 def handle_negative_values(df):
-  new_df = df.copy()
+  df_tmp = df.copy()
   pollutant_cols = ["COUGM3", "NO2UGM3", "O3UGM3", "PM25", "SO2UGM3"]
-  new_df[pollutant_cols] = new_df[pollutant_cols].clip(lower=0)
-  return new_df
+  df_tmp[pollutant_cols] = df_tmp[pollutant_cols].clip(lower=0)
+  return df_tmp
 
 
 def handle_datetime(df, format="%d-%b-%Y %H:%M", remove_date=True):
-  new_df = df.copy()
-  new_df["DATETIME"] = pd.to_datetime(new_df["DATETIME"], format=format)
-  new_df = new_df.assign(
-    YEAR=new_df["DATETIME"].dt.year,
-    MONTH=new_df["DATETIME"].dt.month,
-    HOUR=new_df["DATETIME"].dt.hour,
+  df_tmp = df.copy()
+  df_tmp["DATETIME"] = pd.to_datetime(df_tmp["DATETIME"], format=format)
+  df_tmp = df_tmp.assign(
+    YEAR=df_tmp["DATETIME"].dt.year,
+    MONTH=df_tmp["DATETIME"].dt.month,
+    HOUR=df_tmp["DATETIME"].dt.hour,
   )
 
   # hora como variable cíclica (0 a 23)
-  new_df["HOUR_SIN"] = np.sin(2 * np.pi * new_df["HOUR"] / 24)
-  new_df["HOUR_COS"] = np.cos(2 * np.pi * new_df["HOUR"] / 24)
+  df_tmp["HOUR_SIN"] = np.sin(2 * np.pi * df_tmp["HOUR"] / 24)
+  df_tmp["HOUR_COS"] = np.cos(2 * np.pi * df_tmp["HOUR"] / 24)
 
   # mes como variable cíclica (1 a 12)
-  new_df["MONTH_SIN"] = np.sin(2 * np.pi * new_df["MONTH"] / 12)
-  new_df["MONTH_COS"] = np.cos(2 * np.pi * new_df["MONTH"] / 12)
+  df_tmp["MONTH_SIN"] = np.sin(2 * np.pi * df_tmp["MONTH"] / 12)
+  df_tmp["MONTH_COS"] = np.cos(2 * np.pi * df_tmp["MONTH"] / 12)
 
   if remove_date:
-    new_df = new_df.drop(columns=["DATETIME"])
+    df_tmp = df_tmp.drop(columns=["DATETIME"])
 
-  return new_df
+  return df_tmp
 
 
 def handle_rainfall(df):
-  new_df = df.copy()
+  df_tmp = df.copy()
 
-  new_df["HAS_RAINFALL"] = new_df["RAINFALL"].apply(lambda x: 1 if x > 0 else 0)
-  new_df = new_df.drop(columns=["RAINFALL"])
+  df_tmp["HAS_RAINFALL"] = df_tmp["RAINFALL"].apply(lambda x: 1 if x > 0 else 0)
+  df_tmp = df_tmp.drop(columns=["RAINFALL"])
 
-  return new_df
+  return df_tmp
+
+
+def handle_uv(df):
+  df_tmp = df.copy()
+  df_tmp = df_tmp[df_tmp["UV_INDEX"] > 0]
+
+  return df_tmp
 
 
 # Fit and save the scaler

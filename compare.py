@@ -13,6 +13,7 @@ from models import (
   transform_scaler,
   handle_datetime,
   handle_rainfall,
+  handle_uv,
 )
 
 
@@ -115,6 +116,7 @@ def main():
   df = handle_datetime(df)
   # df = handle_datetime(df, remove_date=False)
   df = handle_rainfall(df)
+  df = handle_uv(df)  # only for sarima
 
   print("\n=== Data engineering dataset ===")
   print(df.head())
