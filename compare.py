@@ -114,9 +114,9 @@ def main():
   ]
 
   df = handle_datetime(df)
-  # df = handle_datetime(df, remove_date=False)
+  # df = handle_datetime(df, remove_date=False) # for dbscan
   df = handle_rainfall(df)
-  df = handle_uv(df)  # only for sarima
+  # df = handle_uv(df)  # only for sarima
 
   print("\n=== Data engineering dataset ===")
   print(df.head())
