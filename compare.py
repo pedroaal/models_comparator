@@ -29,16 +29,18 @@ def run_dbscan_model(data, skip=False):
   model.plot_results(data)
 
 
-def run_sarima_model(dataset, target_column, skip=False):
+def run_sarima_model(
+  X_train, y_train, X_test, y_test, target_column, skip=False
+):
   if skip:
     return
 
   print("\n=== SARIMA ===")
   model = SARIMAModel(target_column)
   # model.find_sarima_parameters(dataset)
-  model.train(dataset)
-  model.evaluate(dataset)
-  model.get_anomaly_summary()
+  model.train(X_train, y_train)
+  model.evaluate(X_test, y_test)
+  model.plot_results()
 
 
 def run_random_forest_model(X_train, X_test, y_train, y_test, skip=False):
@@ -134,15 +136,13 @@ def main():
     df_scaled[numerical_features]
   )
 
-  series = df_scaled[target_column].dropna()
-
   # Anomaly detector models
   run_dbscan_model(df_scaled, skip=True)
-  run_sarima_model(series, target_column, skip=True)
+  run_sarima_model(X_train, y_train, X_test, y_test, target_column, skip=False)
 
   # Predictive models
   run_random_forest_model(X_train, X_test, y_train, y_test, skip=True)
-  run_svm_model(X_train, X_test, y_train, y_test, skip=False)
+  run_svm_model(X_train, X_test, y_train, y_test, skip=True)
   run_lstm_model(
     X_train,
     X_test,
