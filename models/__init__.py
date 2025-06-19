@@ -9,6 +9,7 @@ from .transformers import (
   handle_datetime,
   handle_rainfall,
   handle_uv,
+  handle_window,
   fit_scaler,
   transform_scaler,
 )
@@ -18,6 +19,7 @@ __all__ = [
   "handle_datetime",
   "handle_rainfall",
   "handle_uv",
+  "handle_window",
   "fit_scaler",
   "transform_scaler",
   "DBSCANModel",

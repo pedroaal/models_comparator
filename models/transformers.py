@@ -1,9 +1,6 @@
 import joblib
 import pandas as pd
 import numpy as np
-from sklearn.decomposition import PCA
-from sklearn.pipeline import Pipeline
-from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import RobustScaler
 
 
@@ -51,6 +48,16 @@ def handle_uv(df):
   df_tmp = df_tmp[df_tmp["UV_INDEX"] > 0]
 
   return df_tmp
+
+
+def handle_window(df, window_size=12):
+  df_tmp = df.copy()
+  return np.array(
+    [
+      df_tmp.iloc[i : i + window_size]
+      for i in range(0, len(df_tmp), window_size)
+    ]
+  )
 
 
 # Fit and save the scaler
