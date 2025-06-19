@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 
 from models import (
@@ -18,18 +19,18 @@ from models import (
 )
 
 
-def run_dbscan_model(data, skip=False):
+def run_dbscan_model(X, X_series, X_scaled, skip=False):
   if skip:
     return
 
   print("\n=== DBSCAN ===")
   model = DBSCANModel()
-  model.train(data)
-  model.evaluate(data)
-  model.plot_anomalies(data)
-  model.plot_pca(data)
-  model.plot_results(data)
-  model.get_anomalies(data)
+  model.train(X_scaled)
+  model.evaluate(X_scaled)
+  model.plot_anomalies(X)
+  model.plot_pca(X_scaled)
+  model.plot_window(X_series)
+  model.get_anomalies(X)
 
 
 def run_sarima_model(
@@ -134,14 +135,11 @@ def main():
   X_train[numerical_features] = transform_scaler(X_train[numerical_features])
   X_test[numerical_features] = transform_scaler(X_test[numerical_features])
 
-  df_scaled = df.copy()
-  df_scaled = handle_window(df_scaled)
-  df_scaled[numerical_features] = transform_scaler(
-    df_scaled[numerical_features]
-  )
+  y_series = handle_window(y)  # for dbscan
+  y_series_scaled = StandardScaler().fit_transform(y_series)  # for dbscan
 
   # Anomaly detector models
-  run_dbscan_model(df_scaled, skip=False)
+  run_dbscan_model(y, y_series, y_series_scaled, skip=False)
   run_sarima_model(X_train, y_train, X_test, y_test, target_column, skip=True)
 
   # Predictive models
