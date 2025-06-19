@@ -14,6 +14,7 @@ from models import (
   handle_datetime,
   handle_rainfall,
   handle_uv,
+  handle_window,
 )
 
 
@@ -25,9 +26,10 @@ def run_dbscan_model(data, skip=False):
   model = DBSCANModel()
   model.train(data)
   model.evaluate(data)
-  model.get_anomalies(data)
-  model.get_clusters_info()
+  model.plot_anomalies(data)
+  model.plot_pca(data)
   model.plot_results(data)
+  model.get_anomalies(data)
 
 
 def run_sarima_model(
@@ -114,7 +116,7 @@ def main():
   ]
 
   df = handle_datetime(df)
-  # df = handle_datetime(df, remove_date=False) # for dbscan
+  # df = handle_datetime(df, remove_date=False) # for lstm
   df = handle_rainfall(df)
   # df = handle_uv(df)  # only for sarima
 
@@ -133,13 +135,14 @@ def main():
   X_test[numerical_features] = transform_scaler(X_test[numerical_features])
 
   df_scaled = df.copy()
+  df_scaled = handle_window(df_scaled)
   df_scaled[numerical_features] = transform_scaler(
     df_scaled[numerical_features]
   )
 
   # Anomaly detector models
-  run_dbscan_model(df_scaled, skip=True)
-  run_sarima_model(X_train, y_train, X_test, y_test, target_column, skip=False)
+  run_dbscan_model(df_scaled, skip=False)
+  run_sarima_model(X_train, y_train, X_test, y_test, target_column, skip=True)
 
   # Predictive models
   run_random_forest_model(X_train, X_test, y_train, y_test, skip=True)
