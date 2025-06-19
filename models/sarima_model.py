@@ -107,10 +107,10 @@ class SARIMAModel:
 
     return best_params, best_seasonal_params
 
-  def plot_results(self, figsize=(15, 12), save_path="sarima_results.png"):
+  def plot_results(self, save_path="sarima_results.png"):
     # Residual diagnostics
     residuals = self.model.resid
-    plt.figure(figsize=figsize)
+    plt.figure(figsize=(15, 12))
 
     plt.subplot(2, 2, 1)
     plt.plot(residuals)
