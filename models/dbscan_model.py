@@ -29,6 +29,8 @@ class DBSCANModel:
     end_time = time.time()
     print(f"DBSCAN training completed in {end_time - start_time:.2f} seconds")
     self.labels = labels
+    # Anomalías son las ventanas con etiqueta -1
+    self.anomalies = np.where(labels == -1)[0]
     # Save the fitted model and labels
     model_data = {
       "labels": labels,
@@ -72,9 +74,6 @@ class DBSCANModel:
     For anomaly detection, y can be true anomaly labels if available
     """
     labels = self.labels
-
-    # Anomalías son las ventanas con etiqueta -1
-    self.anomalies = np.where(labels == -1)[0]
     mask = labels != -1  # quitamos outliers
 
     metrics = {
@@ -99,8 +98,8 @@ class DBSCANModel:
 
     return metrics
 
-  def plot_anomalies(self, X, save_path="dbscan_anomalies.png"):
-    anomaly_indices = self.anomalies + 12 - 1
+  def plot_anomalies(self, X, window_size=12, save_path="dbscan_anomalies.png"):
+    anomaly_indices = self.anomalies + window_size - 1
 
     plt.figure(figsize=(12, 8))
     plt.plot(X.values, label="Serie original")
@@ -138,7 +137,7 @@ class DBSCANModel:
     plt.savefig(save_path)
     plt.show()
 
-  def plot_window(self, X, save_path="dbscan_results.png"):
+  def plot_window(self, X, save_path="dbscan_window.png"):
     labels = self.labels
     n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
 
