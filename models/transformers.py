@@ -50,12 +50,14 @@ def handle_uv(df):
   return df_tmp
 
 
-def handle_window(series, window_size=12):
+def handle_window(df, window_size=12):
+  df_tmp = df.copy()
+
   return np.array(
     [
-      series.iloc[i : i + window_size].values
-      for i in range(0, len(series), window_size)
-      if i + window_size <= len(series)
+      df_tmp.iloc[i : i + window_size].values
+      for i in range(0, len(df_tmp))
+      if i + window_size <= len(df_tmp)
     ]
   )
 
