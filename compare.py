@@ -119,7 +119,7 @@ def main():
   df = handle_datetime(df)
   # df = handle_datetime(df, remove_date=False) # for lstm
   df = handle_rainfall(df)
-  # df = handle_uv(df)  # only for sarima
+  df = handle_uv(df)  # only for sarima
 
   print("\n=== Data engineering dataset ===")
   print(df.head())
@@ -139,8 +139,8 @@ def main():
   y_series_scaled = StandardScaler().fit_transform(y_series)  # for dbscan
 
   # Anomaly detector models
-  run_dbscan_model(y, y_series, y_series_scaled, skip=False)
-  run_sarima_model(X_train, y_train, X_test, y_test, target_column, skip=True)
+  run_dbscan_model(y, y_series, y_series_scaled, skip=True)
+  run_sarima_model(X_train, y_train, X_test, y_test, target_column, skip=False)
 
   # Predictive models
   run_random_forest_model(X_train, X_test, y_train, y_test, skip=True)
