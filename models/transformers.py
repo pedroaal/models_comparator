@@ -52,11 +52,17 @@ def handle_uv(df):
   return df_tmp
 
 
-def handle_window(df, window_size=12):
+def handle_window(df, window_size=12, target_col=None):
   df_tmp = df.copy()
 
+  if target_col is not None:
+    target_idx = df.columns.get_loc(target_col)
+    return np.array(
+      [df_tmp.iloc[i + window_size, target_idx] for i in range(len(df_tmp) - window_size)]
+    )
+
   return np.array(
-    [df_tmp.iloc[i : i + window_size].values for i in range(0, len(df_tmp)) if i + window_size <= len(df_tmp)]
+    [df_tmp.iloc[i : i + window_size].values for i in range(len(df_tmp) - window_size)]
   )
 
 
