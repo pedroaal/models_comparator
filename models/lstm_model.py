@@ -1,5 +1,6 @@
 # models/lstm_model.py
 import numpy as np
+import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Dropout
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
@@ -10,7 +11,7 @@ import time
 
 class LSTMModel:
   def __init__(
-    self, window_size, features, output_shape=1, path="lstm_model.h5"
+    self, features, window_size=24, output_shape=1, path="lstm_model.h5"
   ):
     self.window_size = window_size
     self.input_shape = (window_size, features)
@@ -20,28 +21,20 @@ class LSTMModel:
 
   def _build_model(self):
     model = Sequential()
-    model.add(LSTM(50, return_sequences=True, input_shape=self.input_shape))
+    model.add(LSTM(64, return_sequences=True, input_shape=self.input_shape))
     model.add(Dropout(0.2))
-    model.add(LSTM(50, return_sequences=True))
+    model.add(LSTM(32, return_sequences=False))
     model.add(Dropout(0.2))
-    model.add(LSTM(50))
-    model.add(Dropout(0.2))
-    model.add(Dense(25))
+    model.add(Dense(16, activation='relu'))
     model.add(Dense(self.output_shape))
 
-    model.compile(loss="mean_squared_error", optimizer="adam")
+    model.compile(loss="mse", optimizer="adam", metrics=['mae'])
 
     return model
 
   def train(self, X, y, epochs=100):
-    early_stopping = EarlyStopping(
-      monitor="val_loss", patience=20, restore_best_weights=True
-    )
-    reduce_lr = ReduceLROnPlateau(
-      monitor="val_loss", factor=0.5, patience=10, min_lr=1e-6
-    )
+    early_stopping = EarlyStopping(patience=10, restore_best_weights=True)
 
-    X, y = self.create_sequences(X, y)
     start_time = time.time()
     self.model.fit(
       X,
@@ -49,18 +42,20 @@ class LSTMModel:
       epochs=epochs,
       batch_size=32,
       validation_split=0.2,
-      callbacks=[early_stopping, reduce_lr],
+      callbacks=[early_stopping],
       verbose=1,
     )
     end_time = time.time()
     print(f"LSTM training completed in {end_time - start_time:.2f} seconds")
-    self.model.save(self.model_path)
+    self.model.save(self.model_path, save_format="h5")
 
   def predict(self, data):
+    model = load_model(self.model_path, compile=False)
     return self.model.predict(data)
 
   def evaluate(self, X, y):
-    model = load_model(self.model_path)
+    model = self.model
+    model.compile(loss="mse", optimizer="adam", metrics=['mae'])
     y_pred = model.predict(X)
 
     metrics = {
@@ -75,11 +70,47 @@ class LSTMModel:
 
     return metrics
 
-  def create_sequences(self, X, y):
-    X_seq, y_seq = [], []
+  def plot_results(self, X, y, save_path="lstm_results.png"):
+    """
+    Plot results for LSTM Model
+    """
+    model = self.model
+    y_pred = model.predict(X)
 
-    for i in range(len(X) - self.window_size):
-      X_seq.append(X.iloc[i : (i + self.window_size)].values)
-      y_seq.append(y.iloc[i + self.window_size])
+    y_pred = y_pred.squeeze()
 
-    return np.array(X_seq), np.array(y_seq)
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    fig.suptitle("LSTM Neural Network Regression Results", fontsize=16)
+
+    # Plot 1: Actual vs Predicted
+    axes[0, 0].scatter(y, y_pred, alpha=0.6)
+    axes[0, 0].plot([y.min(), y.max()], [y.min(), y.max()], "r--", lw=2)
+    axes[0, 0].set_xlabel("Actual Values")
+    axes[0, 0].set_ylabel("Predicted Values")
+    axes[0, 0].set_title("Actual vs Predicted Values")
+
+    # Plot 2: Residuals
+    residuals = y - y_pred
+    axes[0, 1].scatter(y_pred, residuals, alpha=0.6)
+    axes[0, 1].axhline(y=0, color="r", linestyle="--")
+    axes[0, 1].set_xlabel("Predicted Values")
+    axes[0, 1].set_ylabel("Residuals")
+    axes[0, 1].set_title("Residual Plot")
+
+    # Plot 3: Loss Curve
+    axes[1, 0].plot(model.history.history['loss'], label='Training Loss')
+    axes[1, 0].plot(model.history.history['val_loss'], label='Validation Loss')
+    axes[1, 0].set_xlabel("Epochs")
+    axes[1, 0].set_ylabel("Loss")
+    axes[1, 0].set_title("Training and Validation Loss Curve")
+    axes[1, 0].legend()
+
+    # Plot 4: Error Distribution
+    axes[1, 1].hist(residuals, bins=30, alpha=0.7, color="skyblue")
+    axes[1, 1].set_xlabel("Residuals")
+    axes[1, 1].set_ylabel("Frequency")
+    axes[1, 1].set_title("Residuals Distribution")
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+    plt.show()

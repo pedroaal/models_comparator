@@ -70,14 +70,16 @@ def run_svm_model(X_train, X_test, y_train, y_test, skip=False):
   model.plot_results(X_test, y_test)
 
 
-def run_lstm_model(X_train, X_test, y_train, y_test, window_size=24, skip=False):
+def run_lstm_model(X_train, X_test, y_train, y_test, skip=False):
   if skip:
     return
 
   print("\n=== LSTM ===")
-  model = LSTMModel(window_size, X_train.shape[1])
+  print(X_train.shape)
+  model = LSTMModel(26, window_size=24)
   model.train(X_train, y_train, epochs=100)
   model.evaluate(X_test, y_test)
+  model.plot_results(X_test, y_test)
 
 
 def run_mlp_model(X_train, X_test, y_train, y_test, skip=False):
@@ -122,18 +124,21 @@ def main():
   X = df.drop(columns=[target_column], axis=1)
   y = df[target_column]
 
-  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28)
+  # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28)
+  
+  fit_scaler(X[numerical_features])
+  X[numerical_features] = transform_scaler(X[numerical_features])
 
-  fit_scaler(X_train[numerical_features])
-  X_train[numerical_features] = transform_scaler(X_train[numerical_features])
-  X_test[numerical_features] = transform_scaler(X_test[numerical_features])
+  X_series = handle_window(X, window_size=24) # only for ltsm
+  y_series = handle_window(df, window_size=24, target_col=target_column) # only for ltsm
+  X_train, X_test, y_train, y_test = train_test_split(X_series, y_series, test_size=0.2, random_state=28)
 
   y_series = handle_window(y)  # for dbscan
   y_series_scaled = StandardScaler().fit_transform(y_series)  # for dbscan
 
   # Anomaly detector models
   run_dbscan_model(y, y_series, y_series_scaled, skip=True)
-  run_sarima_model(X, y, skip=False)
+  run_sarima_model(X, y, skip=True)
 
   # Predictive models
   run_random_forest_model(X_train, X_test, y_train, y_test, skip=True)
@@ -143,8 +148,7 @@ def main():
     X_test,
     y_train,
     y_test,
-    window_size=24,
-    skip=True,
+    skip=False,
   )
   run_mlp_model(X_train, X_test, y_train, y_test, skip=True)
 
