@@ -11,25 +11,25 @@ import time
 class SARIMAModel:
   def __init__(
     self,
-    target_column,
+    period=12,
     path="sarima_model.joblib",
   ):
     self.model_path = path
-    self.target_column = target_column
     self.anomalies = None
     self.model = None
+    self.period = period
 
   def train(self, X, y):
     model = SARIMAX(
       y,
       exog=X,
       order=(2, 0, 2),
-      seasonal_order=(1, 1, 1, 12),
+      seasonal_order=(1, 1, 1, self.period),
       enforce_stationarity=False,
       enforce_invertibility=False,
     )
     start_time = time.time()
-    model = model.fit(disp=False)
+    model = model.fit(disp=True)
     end_time = time.time()
     print(f"Sarima training completed in {end_time - start_time:.2f} seconds")
     self.model = model
@@ -38,7 +38,7 @@ class SARIMAModel:
   def predict(self, X: list[float]):
     try:
       loaded_model = joblib.load(self.model_path)
-      prediction = loaded_model.get_forecast(steps=len(X), exog=X)
+      prediction = loaded_model.get_forecast(steps=len(y), exog=X)
       return prediction.predicted_mean
     except Exception as e:
       print(f"Error loading model: {e}")
@@ -107,14 +107,28 @@ class SARIMAModel:
 
     return best_params, best_seasonal_params
 
-  def plot_results(self, save_path="sarima_results.png"):
+  def plot_results(self, X, y, save_path="sarima_results.png"):
     # Residual diagnostics
     residuals = self.model.resid
+    forecast = self.model.get_forecast(steps=len(y), exog=X)
+    forecast_ci = forecast.conf_int()
     plt.figure(figsize=(15, 12))
 
     plt.subplot(2, 2, 1)
-    plt.plot(residuals)
-    plt.title("Residuals")
+    plt.plot(y.index, y, label="Observado")
+    plt.plot(forecast.predicted_mean.index, forecast.predicted_mean, color="red", label="Predicción SARIMA")
+    plt.fill_between(
+      forecast_ci.index,
+      forecast_ci.iloc[:, 0],
+      forecast_ci.iloc[:, 1],
+      color="pink",
+      alpha=0.3,
+      label="Intervalo de Confianza",
+    )
+    plt.title("Predicción de UV_INDEX con SARIMA")
+    plt.xlabel("Fecha")
+    plt.ylabel("UV_INDEX")
+    plt.legend()
 
     plt.subplot(2, 2, 2)
     plt.hist(residuals, bins=20)

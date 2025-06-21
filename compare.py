@@ -14,7 +14,6 @@ from models import (
   transform_scaler,
   handle_datetime,
   handle_rainfall,
-  handle_uv,
   handle_window,
 )
 
@@ -33,18 +32,16 @@ def run_dbscan_model(X, X_series, X_scaled, skip=False):
   model.get_anomalies(X)
 
 
-def run_sarima_model(
-  X_train, y_train, X_test, y_test, target_column, skip=False
-):
+def run_sarima_model(X, y, skip=False):
   if skip:
     return
 
   print("\n=== SARIMA ===")
-  model = SARIMAModel(target_column)
+  model = SARIMAModel(period=12)
   # model.find_sarima_parameters(dataset)
-  model.train(X_train, y_train)
-  model.evaluate(X_test, y_test)
-  model.plot_results()
+  model.train(X, y)
+  model.evaluate(X, y)
+  model.plot_results(X, y)
 
 
 def run_random_forest_model(X_train, X_test, y_train, y_test, skip=False):
@@ -73,9 +70,7 @@ def run_svm_model(X_train, X_test, y_train, y_test, skip=False):
   model.plot_results(X_test, y_test)
 
 
-def run_lstm_model(
-  X_train, X_test, y_train, y_test, window_size=24, skip=False
-):
+def run_lstm_model(X_train, X_test, y_train, y_test, window_size=24, skip=False):
   if skip:
     return
 
@@ -116,10 +111,10 @@ def main():
     "SO2UGM3",
   ]
 
-  df = handle_datetime(df)
-  # df = handle_datetime(df, remove_date=False) # for lstm
+  # df = handle_datetime(df)
+  df = handle_datetime(df, date_index=True)  # for sarima
   df = handle_rainfall(df)
-  df = handle_uv(df)  # only for sarima
+  # df = handle_uv(df)  # remove where uv_index is 0
 
   print("\n=== Data engineering dataset ===")
   print(df.head())
@@ -127,9 +122,7 @@ def main():
   X = df.drop(columns=[target_column], axis=1)
   y = df[target_column]
 
-  X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=28
-  )
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28)
 
   fit_scaler(X_train[numerical_features])
   X_train[numerical_features] = transform_scaler(X_train[numerical_features])
@@ -140,7 +133,7 @@ def main():
 
   # Anomaly detector models
   run_dbscan_model(y, y_series, y_series_scaled, skip=True)
-  run_sarima_model(X_train, y_train, X_test, y_test, target_column, skip=False)
+  run_sarima_model(X, y, skip=False)
 
   # Predictive models
   run_random_forest_model(X_train, X_test, y_train, y_test, skip=True)

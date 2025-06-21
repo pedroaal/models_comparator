@@ -11,7 +11,7 @@ def handle_negative_values(df):
   return df_tmp
 
 
-def handle_datetime(df, format="%d-%b-%Y %H:%M", remove_date=True):
+def handle_datetime(df, format="%d-%b-%Y %H:%M", date_index=False):
   df_tmp = df.copy()
   df_tmp["DATETIME"] = pd.to_datetime(df_tmp["DATETIME"], format=format)
   df_tmp = df_tmp.assign(
@@ -28,7 +28,9 @@ def handle_datetime(df, format="%d-%b-%Y %H:%M", remove_date=True):
   df_tmp["MONTH_SIN"] = np.sin(2 * np.pi * df_tmp["MONTH"] / 12)
   df_tmp["MONTH_COS"] = np.cos(2 * np.pi * df_tmp["MONTH"] / 12)
 
-  if remove_date:
+  if date_index:
+    df_tmp.set_index("DATETIME", inplace=True)
+  else:
     df_tmp = df_tmp.drop(columns=["DATETIME"])
 
   return df_tmp
@@ -54,11 +56,7 @@ def handle_window(df, window_size=12):
   df_tmp = df.copy()
 
   return np.array(
-    [
-      df_tmp.iloc[i : i + window_size].values
-      for i in range(0, len(df_tmp))
-      if i + window_size <= len(df_tmp)
-    ]
+    [df_tmp.iloc[i : i + window_size].values for i in range(0, len(df_tmp)) if i + window_size <= len(df_tmp)]
   )
 
 
