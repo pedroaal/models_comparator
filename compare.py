@@ -104,14 +104,6 @@ def main():
   print(df.head())
 
   target_column = "UV_INDEX"
-  numerical_features = [
-    "AMBTEMP",
-    "COUGM3",
-    "NO2UGM3",
-    "O3UGM3",
-    "PM25",
-    "SO2UGM3",
-  ]
 
   df = handle_datetime(df)
   # df = handle_datetime(df, date_index=True)  # for sarima
@@ -124,24 +116,17 @@ def main():
   X = df.drop(columns=[target_column], axis=1)
   y = df[target_column]
 
-  shuffle = False  # false for timeseries
-  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28, shuffle=shuffle)
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28)
 
-  fit_scaler(X_train[numerical_features])
-  X_train[numerical_features] = transform_scaler(X_train[numerical_features])
-  X_test[numerical_features] = transform_scaler(X_test[numerical_features])
+  fit_scaler(X_train)
+  X_train = transform_scaler(X_train)
+  X_test = transform_scaler(X_test)
 
-  y_series = handle_window(y)  # for dbscan
-  y_series_scaled = StandardScaler().fit_transform(y_series)  # for dbscan
-
-  # Anomaly detector models
-  run_dbscan_model(y, y_series, y_series_scaled, skip=True)
-  run_sarima_model(X, y, skip=True)
-
-  # Predictive models
   run_random_forest_model(X_train, X_test, y_train, y_test, skip=True)
   run_svm_model(X_train, X_test, y_train, y_test, skip=True)
   run_mlp_model(X_train, X_test, y_train, y_test, skip=True)
+
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28, shuffle=False)
 
   X_scaler = RobustScaler()
   X_train_scaled = X_scaler.fit_transform(X_train)
@@ -150,6 +135,13 @@ def main():
   y_scaler = RobustScaler()
   y_train_scaled = y_scaler.fit_transform(y_train.values.reshape(-1, 1))
   y_test_scaled = y_scaler.transform(y_test.values.reshape(-1, 1))
+
+  y_series = handle_window(y)  # for dbscan
+  y_series_scaled = StandardScaler().fit_transform(y_series)  # for dbscan
+
+  # Anomaly detector models
+  run_dbscan_model(y, y_series, y_series_scaled, skip=True)
+  run_sarima_model(X, y, skip=True)
 
   # only for ltsm
   X_train_series = handle_window(pd.DataFrame(X_train_scaled, columns=X.columns, index=X_train.index), window_size=24)
