@@ -10,9 +10,7 @@ import time
 
 
 class LSTMModel:
-  def __init__(
-    self, features, window_size=24, output_shape=1, path="lstm_model.h5"
-  ):
+  def __init__(self, features, window_size=24, output_shape=1, path="lstm_model.h5"):
     self.window_size = window_size
     self.input_shape = (window_size, features)
     self.output_shape = output_shape
@@ -25,15 +23,16 @@ class LSTMModel:
     model.add(Dropout(0.2))
     model.add(LSTM(32, return_sequences=False))
     model.add(Dropout(0.2))
-    model.add(Dense(16, activation='relu'))
+    model.add(Dense(16, activation="relu"))
     model.add(Dense(self.output_shape))
 
-    model.compile(loss="mse", optimizer="adam", metrics=['mae'])
+    model.compile(loss="mse", optimizer="adam", metrics=["mae"])
 
     return model
 
-  def train(self, X, y, epochs=100):
-    early_stopping = EarlyStopping(patience=10, restore_best_weights=True)
+  def train(self, X, y, epochs=50):
+    early_stopping = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
+    reductor = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3, min_lr=1e-5)
 
     start_time = time.time()
     self.model.fit(
@@ -41,8 +40,8 @@ class LSTMModel:
       y,
       epochs=epochs,
       batch_size=32,
-      validation_split=0.2,
-      callbacks=[early_stopping],
+      validation_split=0.1,
+      callbacks=[early_stopping, reductor],
       verbose=1,
     )
     end_time = time.time()
@@ -55,7 +54,6 @@ class LSTMModel:
 
   def evaluate(self, X, y):
     model = self.model
-    model.compile(loss="mse", optimizer="adam", metrics=['mae'])
     y_pred = model.predict(X)
 
     metrics = {
@@ -90,7 +88,7 @@ class LSTMModel:
     axes[0, 0].set_title("Actual vs Predicted Values")
 
     # Plot 2: Residuals
-    residuals = y - y_pred
+    residuals = np.array(y) - np.array(y_pred)
     axes[0, 1].scatter(y_pred, residuals, alpha=0.6)
     axes[0, 1].axhline(y=0, color="r", linestyle="--")
     axes[0, 1].set_xlabel("Predicted Values")
@@ -98,8 +96,8 @@ class LSTMModel:
     axes[0, 1].set_title("Residual Plot")
 
     # Plot 3: Loss Curve
-    axes[1, 0].plot(model.history.history['loss'], label='Training Loss')
-    axes[1, 0].plot(model.history.history['val_loss'], label='Validation Loss')
+    axes[1, 0].plot(model.history.history["loss"], label="Training Loss")
+    axes[1, 0].plot(model.history.history["val_loss"], label="Validation Loss")
     axes[1, 0].set_xlabel("Epochs")
     axes[1, 0].set_ylabel("Loss")
     axes[1, 0].set_title("Training and Validation Loss Curve")

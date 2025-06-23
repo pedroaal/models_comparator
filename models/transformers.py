@@ -52,18 +52,12 @@ def handle_uv(df):
   return df_tmp
 
 
-def handle_window(df, window_size=12, target_col=None):
+def handle_window(df, window_size=12, target_column=False):
   df_tmp = df.copy()
+  if target_column:
+    return np.array([df_tmp.iloc[i + window_size] for i in range(len(df_tmp) - window_size)])
 
-  if target_col is not None:
-    target_idx = df.columns.get_loc(target_col)
-    return np.array(
-      [df_tmp.iloc[i + window_size, target_idx] for i in range(len(df_tmp) - window_size)]
-    )
-
-  return np.array(
-    [df_tmp.iloc[i : i + window_size].values for i in range(len(df_tmp) - window_size)]
-  )
+  return np.array([df_tmp.iloc[i : i + window_size].values for i in range(len(df_tmp) - window_size)])
 
 
 # Fit and save the scaler
