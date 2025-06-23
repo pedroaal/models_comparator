@@ -170,7 +170,7 @@
 
             <div class="flex justify-center">
                 <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl text-center max-w-sm">
-                    <h4 class="text-lg font-semibold text-blue-800 mb-3">Ambient Temperature Prediction</h4>
+                    <h4 class="text-lg font-semibold text-blue-800 mb-3">UV index Predicted</h4>
                     <p class="text-4xl font-bold text-blue-600 mb-2">
                         <span class="prediction-value" />°C
                     </p>
@@ -254,7 +254,7 @@
 
                 // Send JSON data to API
                 $.ajax({
-                    url: 'http://localhost:8000/predict',
+                    url: 'https://refactored-tribble-w9jjqxwxp953974g-8000.app.github.dev/predict',
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
