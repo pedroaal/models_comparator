@@ -139,7 +139,7 @@ def main():
 
   # Anomaly detector models
   run_dbscan_model(y, y_series, y_series_scaled, skip=True)
-  run_sarima_model(X, y, skip=True)
+  run_sarima_model(X, y, skip=False)
 
   # only for ltsm
   X_train_series = handle_window(pd.DataFrame(X_train_scaled, columns=X.columns, index=X_train.index), window_size=24)
@@ -153,7 +153,7 @@ def main():
     y_train_series,
     y_test_series,
     scaler=y_scaler,
-    skip=False,
+    skip=True,
   )
 
 
