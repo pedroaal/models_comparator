@@ -75,8 +75,8 @@ def run_lstm_model(X_train, X_test, y_train, y_test, skip=False):
     return
 
   print("\n=== LSTM ===")
-  print(X_train.shape)
-  model = LSTMModel(26, window_size=24)
+  features = int(X_train.shape[2])
+  model = LSTMModel(features, window_size=24)
   model.train(X_train, y_train, epochs=100)
   model.evaluate(X_test, y_test)
   model.plot_results(X_test, y_test)
