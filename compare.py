@@ -15,7 +15,6 @@ from models import (
   handle_datetime,
   handle_rainfall,
   handle_window,
-  handle_uv,
 )
 
 
@@ -77,8 +76,8 @@ def run_lstm_model(X_train, X_test, y_train, y_test, skip=False):
 
   print("\n=== LSTM ===")
   features = int(X_train.shape[2])
-  model = LSTMModel(features, window_size=12)
-  model.train(X_train, y_train, epochs=50)
+  model = LSTMModel(features, window_size=24)
+  model.train(X_train, y_train)
   model.evaluate(X_test, y_test)
   model.plot_results(X_test, y_test)
 
@@ -117,7 +116,7 @@ def main():
   df = handle_datetime(df)
   # df = handle_datetime(df, date_index=True)  # for sarima
   df = handle_rainfall(df)
-  df = handle_uv(df)  # remove where uv_index is 0
+  # df = handle_uv(df)  # remove where uv_index is 0
 
   print("\n=== Data engineering dataset ===")
   print(df.head())
@@ -127,8 +126,9 @@ def main():
 
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28)
 
-  fit_scaler(X[numerical_features])
-  X[numerical_features] = transform_scaler(X[numerical_features])
+  fit_scaler(X_train[numerical_features])
+  X_train[numerical_features] = transform_scaler(X_train[numerical_features])
+  X_test[numerical_features] = transform_scaler(X_test[numerical_features])
 
   y_series = handle_window(y)  # for dbscan
   y_series_scaled = StandardScaler().fit_transform(y_series)  # for dbscan
@@ -142,15 +142,17 @@ def main():
   run_svm_model(X_train, X_test, y_train, y_test, skip=True)
   run_mlp_model(X_train, X_test, y_train, y_test, skip=True)
 
-  X_series = handle_window(X, window_size=12)  # only for ltsm
-  y_series = handle_window(df, window_size=12, target_col=target_column)  # only for ltsm
-  X_train, X_test, y_train, y_test = train_test_split(X_series, y_series, test_size=0.2, random_state=28)
+  # only for ltsm
+  X_train_series = handle_window(X_train, window_size=24)
+  y_train_series = handle_window(y_train, window_size=24, target_column=True)
+  X_test_series = handle_window(X_test, window_size=24)
+  y_test_series = handle_window(y_test, window_size=24, target_column=True)
 
   run_lstm_model(
-    X_train,
-    X_test,
-    y_train,
-    y_test,
+    X_train_series,
+    X_test_series,
+    y_train_series,
+    y_test_series,
     skip=False,
   )
 
