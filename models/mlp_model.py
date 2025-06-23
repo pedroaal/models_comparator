@@ -19,7 +19,7 @@ import time
 
 
 class MLPModel:
-  def __init__(self, path="mlp_model.joblib"):
+  def __init__(self, path="/results/mlp_model.joblib"):
     self.model = Pipeline(
       [
         ("pca", PCA(n_components=8)),
@@ -114,9 +114,7 @@ class MLPModel:
 
     return grid_search.best_estimator_
 
-  def plot_results(
-    self, X, y_true, save_path="mlp_results.png", task_type="regression"
-  ):
+  def plot_results(self, X, y_true, save_path="/results/mlp_results.png", task_type="regression"):
     """
     Plot results for MLP Model
     task_type: 'regression' or 'classification'
@@ -130,9 +128,7 @@ class MLPModel:
 
       # Plot 1: Actual vs Predicted
       axes[0, 0].scatter(y_true, y_pred, alpha=0.6)
-      axes[0, 0].plot(
-        [y_true.min(), y_true.max()], [y_true.min(), y_true.max()], "r--", lw=2
-      )
+      axes[0, 0].plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], "r--", lw=2)
       axes[0, 0].set_xlabel("Actual Values")
       axes[0, 0].set_ylabel("Predicted Values")
       axes[0, 0].set_title("Actual vs Predicted Values")
@@ -209,9 +205,7 @@ class MLPModel:
         axes[1, 0].legend(loc="lower right")
 
       # Plot 4: Classification Report Heatmap
-      report = classification_report(
-        y_true_class, y_pred_class, output_dict=True
-      )
+      report = classification_report(y_true_class, y_pred_class, output_dict=True)
       report_df = pd.DataFrame(report).iloc[:-1, :].T
       sns.heatmap(report_df, annot=True, cmap="Blues", ax=axes[1, 1])
       axes[1, 1].set_title("Classification Report")

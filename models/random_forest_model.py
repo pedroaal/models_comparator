@@ -16,7 +16,7 @@ import time
 
 
 class RandomForestModel:
-  def __init__(self, path="rf_model.joblib"):
+  def __init__(self, path="/results/rf_model.joblib"):
     self.model = RandomForestRegressor(n_estimators=100, random_state=28)
     self.model_path = path
 
@@ -24,9 +24,7 @@ class RandomForestModel:
     start_time = time.time()
     self.model.fit(X, y)
     end_time = time.time()
-    print(
-      f"Random forest training completed in {end_time - start_time:.2f} seconds"
-    )
+    print(f"Random forest training completed in {end_time - start_time:.2f} seconds")
     joblib.dump(self.model, self.model_path)
 
   def predict(self, data: list[float]):
@@ -59,7 +57,7 @@ class RandomForestModel:
     self,
     X,
     y_true,
-    save_path="random_forest_results.png",
+    save_path="/results/random_forest_results.png",
     task_type="regression",
   ):
     """
@@ -75,9 +73,7 @@ class RandomForestModel:
 
       # Plot 1: Actual vs Predicted
       axes[0, 0].scatter(y_true, y_pred, alpha=0.6)
-      axes[0, 0].plot(
-        [y_true.min(), y_true.max()], [y_true.min(), y_true.max()], "r--", lw=2
-      )
+      axes[0, 0].plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], "r--", lw=2)
       axes[0, 0].set_xlabel("Actual Values")
       axes[0, 0].set_ylabel("Predicted Values")
       axes[0, 0].set_title("Actual vs Predicted Values")
@@ -147,9 +143,7 @@ class RandomForestModel:
         axes[1, 0].legend(loc="lower right")
 
       # Plot 4: Classification Report Heatmap
-      report = classification_report(
-        y_true_class, y_pred_class, output_dict=True
-      )
+      report = classification_report(y_true_class, y_pred_class, output_dict=True)
       report_df = pd.DataFrame(report).iloc[:-1, :].T
       sns.heatmap(report_df, annot=True, cmap="Blues", ax=axes[1, 1])
       axes[1, 1].set_title("Classification Report")

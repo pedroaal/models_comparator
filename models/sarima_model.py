@@ -12,7 +12,7 @@ class SARIMAModel:
   def __init__(
     self,
     period=12,
-    path="sarima_model.joblib",
+    path="/results/sarima_model.joblib",
   ):
     self.model_path = path
     self.anomalies = None
@@ -107,7 +107,7 @@ class SARIMAModel:
 
     return best_params, best_seasonal_params
 
-  def plot_results(self, X, y, save_path="sarima_results.png"):
+  def plot_results(self, X, y, save_path="/results/sarima_results.png"):
     # Residual diagnostics
     residuals = self.model.resid
     forecast = self.model.get_forecast(steps=len(y), exog=X)

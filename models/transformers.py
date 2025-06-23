@@ -61,7 +61,7 @@ def handle_window(df, window_size=12, target_column=False):
 
 
 # Fit and save the scaler
-def fit_scaler(df, path="scaler.joblib"):
+def fit_scaler(df, path="/results/scaler.joblib"):
   scaler = RobustScaler()
   scaler.fit(df)
   joblib.dump(scaler, path)
@@ -70,7 +70,7 @@ def fit_scaler(df, path="scaler.joblib"):
 
 
 # Load and use the scaler
-def transform_scaler(df, path="scaler.joblib"):
+def transform_scaler(df, path="/results/scaler.joblib"):
   scaler = joblib.load(path)
 
   return scaler.transform(df)

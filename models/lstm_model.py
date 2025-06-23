@@ -10,7 +10,7 @@ import time
 
 
 class LSTMModel:
-  def __init__(self, features, window_size=24, output_shape=1, path="lstm_model.h5"):
+  def __init__(self, features, window_size=24, output_shape=1, path="/results/lstm_model.h5"):
     self.window_size = window_size
     self.input_shape = (window_size, features)
     self.output_shape = output_shape
@@ -72,7 +72,7 @@ class LSTMModel:
 
     return metrics
 
-  def plot_results(self, X, y, scaler, save_path="lstm_results.png"):
+  def plot_results(self, X, y, scaler, save_path="/results/lstm_results.png"):
     """
     Plot results for LSTM Model
     """
