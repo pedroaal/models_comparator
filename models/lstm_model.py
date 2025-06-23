@@ -52,9 +52,13 @@ class LSTMModel:
     model = load_model(self.model_path, compile=False)
     return self.model.predict(data)
 
-  def evaluate(self, X, y):
+  def evaluate(self, X, y, scaler):
     model = self.model
     y_pred = model.predict(X)
+
+    # reverse scaling
+    y = scaler.inverse_transform(y.reshape(-1, 1))
+    y_pred = scaler.inverse_transform(y_pred)
 
     metrics = {
       "mse": mean_squared_error(y, y_pred),
@@ -68,14 +72,16 @@ class LSTMModel:
 
     return metrics
 
-  def plot_results(self, X, y, save_path="lstm_results.png"):
+  def plot_results(self, X, y, scaler, save_path="lstm_results.png"):
     """
     Plot results for LSTM Model
     """
     model = self.model
     y_pred = model.predict(X)
 
-    y_pred = y_pred.squeeze()
+    # reverse scaling
+    y = scaler.inverse_transform(y.reshape(-1, 1))
+    y_pred = scaler.inverse_transform(y_pred)
 
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))
     fig.suptitle("LSTM Neural Network Regression Results", fontsize=16)

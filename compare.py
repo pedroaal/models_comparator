@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 
 
 from models import (
@@ -70,7 +70,7 @@ def run_svm_model(X_train, X_test, y_train, y_test, skip=False):
   model.plot_results(X_test, y_test)
 
 
-def run_lstm_model(X_train, X_test, y_train, y_test, skip=False):
+def run_lstm_model(X_train, X_test, y_train, y_test, scaler, skip=False):
   if skip:
     return
 
@@ -78,8 +78,8 @@ def run_lstm_model(X_train, X_test, y_train, y_test, skip=False):
   features = int(X_train.shape[2])
   model = LSTMModel(features, window_size=24)
   model.train(X_train, y_train)
-  model.evaluate(X_test, y_test)
-  model.plot_results(X_test, y_test)
+  model.evaluate(X_test, y_test, scaler)
+  model.plot_results(X_test, y_test, scaler)
 
 
 def run_mlp_model(X_train, X_test, y_train, y_test, skip=False):
@@ -124,7 +124,8 @@ def main():
   X = df.drop(columns=[target_column], axis=1)
   y = df[target_column]
 
-  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28)
+  shuffle = False  # false for timeseries
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=28, shuffle=shuffle)
 
   fit_scaler(X_train[numerical_features])
   X_train[numerical_features] = transform_scaler(X_train[numerical_features])
@@ -142,17 +143,26 @@ def main():
   run_svm_model(X_train, X_test, y_train, y_test, skip=True)
   run_mlp_model(X_train, X_test, y_train, y_test, skip=True)
 
+  X_scaler = RobustScaler()
+  X_train_scaled = X_scaler.fit_transform(X_train)
+  X_test_scaled = X_scaler.transform(X_test)
+
+  y_scaler = RobustScaler()
+  y_train_scaled = y_scaler.fit_transform(y_train.values.reshape(-1, 1))
+  y_test_scaled = y_scaler.transform(y_test.values.reshape(-1, 1))
+
   # only for ltsm
-  X_train_series = handle_window(X_train, window_size=24)
-  y_train_series = handle_window(y_train, window_size=24, target_column=True)
-  X_test_series = handle_window(X_test, window_size=24)
-  y_test_series = handle_window(y_test, window_size=24, target_column=True)
+  X_train_series = handle_window(pd.DataFrame(X_train_scaled, columns=X.columns, index=X_train.index), window_size=24)
+  y_train_series = handle_window(pd.DataFrame(y_train_scaled, index=y_train.index), window_size=24, target_column=True)
+  X_test_series = handle_window(pd.DataFrame(X_test_scaled, columns=X.columns, index=X_test.index), window_size=24)
+  y_test_series = handle_window(pd.DataFrame(y_test_scaled, index=y_test.index), window_size=24, target_column=True)
 
   run_lstm_model(
     X_train_series,
     X_test_series,
     y_train_series,
     y_test_series,
+    scaler=y_scaler,
     skip=False,
   )
 
