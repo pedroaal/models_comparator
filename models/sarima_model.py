@@ -38,7 +38,7 @@ class SARIMAModel:
   def predict(self, X: list[float]):
     try:
       loaded_model = joblib.load(self.model_path)
-      prediction = loaded_model.get_forecast(steps=len(y), exog=X)
+      prediction = loaded_model.get_forecast(steps=len(X), exog=X)
       return prediction.predicted_mean
     except Exception as e:
       print(f"Error loading model: {e}")
