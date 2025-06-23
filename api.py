@@ -32,7 +32,7 @@ class Weather(BaseModel):
   no2ugm3: float
   o3ugm3: float
   pm25: float
-  rainfall: float
+  # rainfall: float
   so2ugm3: float
   # uv_index: float
 
@@ -48,7 +48,8 @@ def predict(data: Weather):
         "NO2UGM3": data.no2ugm3,
         "O3UGM3": data.o3ugm3,
         "PM25": data.pm25,
-        "RAINFALL": data.rainfall,
+        "RAINFALL": 0,
+        # "RAINFALL": data.rainfall,
         "SO2UGM3": data.so2ugm3,
         # "UV_INDEX": data.uv_index,
       }
